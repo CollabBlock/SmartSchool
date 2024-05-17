@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "784602135000",
+    "project_id": "reactnative-sms",
+    "storage_bucket": "reactnative-sms.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:784602135000:android:1b4aaaa377349554661aad",
+        "android_client_info": {
+          "package_name": "com.sms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9UC6SX-EbtsW2BRuIHrxboLsOntk9yOA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
