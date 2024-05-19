@@ -4,14 +4,13 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const Login = ({ route }) => {
-  const role = route.params.role;
-  const [username, setUsername] = useState('');
+const Register = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (username === '' || password === '') {
+  const handleRegister = async () => {
+    if (email === '' || password === '') {
       Alert.alert('Error', 'Please enter a valid email and password.');
       return;
     }
@@ -19,48 +18,35 @@ const Login = ({ route }) => {
     setLoading(true);
 
     try {
-      console.log('Attempting to sign in with email:', username);
-
-      const userCredential = await auth().signInWithEmailAndPassword(username, password);
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
 
-      console.log('User authenticated:', user);
+      // Store user role in Firestore
+      await firestore().collection('users').doc(user.uid).set({
+        email: user.email,
+        role: 'user' // default role, can be changed based on your role logic
+      });
 
-      const querySnapshot = await firestore().collection('Users').where('email', '==', user.email).get();
-
-      if (!querySnapshot.empty) {
-        const userDoc = querySnapshot.docs[0];
-        const userData = userDoc.data();
-        console.log('User data retrieved:', userData);
-
-        if (userData.role === role) {
-          Alert.alert('Success', `User signed in as ${userData.role}`);
-        } else {
-          Alert.alert('Error', `User role mismatch: expected ${role}, but found ${userData.role}`);
-          await auth().signOut();
-        }
-      } else {
-        console.log('User document not found');
-        Alert.alert('Error', 'User data not found');
-      }
+      Alert.alert('Success', 'User registered!');
     } catch (error) {
-      console.error('Error during sign in:', error);
+      console.error(error);
       Alert.alert('Error', 'Something went wrong');
     } finally {
       setLoading(false);
-      setUsername('');
+      setEmail('');
       setPassword('');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Icon style={styles.logo} name="school" size={60} color="#3cb371" />
+      <Icon style={styles.logo} name="user-plus" size={60} color="#3cb371" />
+      <Text style={styles.title}>Register</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Email</Text>
         <TextInput
-          value={username}
-          onChangeText={setUsername}
+          value={email}
+          onChangeText={setEmail}
           style={styles.input}
           placeholder="Enter your email"
           placeholderTextColor='#999'
@@ -79,11 +65,11 @@ const Login = ({ route }) => {
           secureTextEntry
         />
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+      <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
         {loading ? (
           <ActivityIndicator color="#fff" size="small" />
         ) : (
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Register</Text>
         )}
       </TouchableOpacity>
     </ScrollView>
@@ -112,10 +98,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 5,
-    color: '#000',
-    marginLeft: 4,
   },
   input: {
     borderWidth: 1,
@@ -130,7 +114,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 10,
   },
   buttonText: {
     color: '#fff',
@@ -139,4 +122,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default Register;

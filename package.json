@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@firebase/firestore": "^4.6.2",
     "@react-native-firebase/app": "^19.2.2",
     "@react-native-firebase/auth": "^19.2.2",
     "@react-native-firebase/firestore": "^19.2.2",

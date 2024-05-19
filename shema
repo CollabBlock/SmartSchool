@@ -1,0 +1,20 @@
+Student:
+o Registration Number (Value: 0-1000) numeric
+o Date of Admission/Registration
+o Name of student
+o Date of Birth
+o Student Gender
+o Father Name, Caste, Occupation, Residence
+o Admission Class
+o Email & Password (for student account)
+o Remarks (If any)
+
+
+Fee Status:
+o Registration
+o Amount Due
+o Amount Paid
+o Payable Amount
+o Payment date
+o Late Fees (Yes/No) → No input
+o Remarks (if any)

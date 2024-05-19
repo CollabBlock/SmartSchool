@@ -11,12 +11,19 @@ const App = () => {
   return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName="RoleSelection">
-          <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
+          
+          <Stack.Screen 
+          name="RoleSelection" 
+          component={RoleSelectionScreen} 
+          options={{ headerShown: false }}
+          />
+          
           <Stack.Screen 
           name="Login" 
           component={Login} 
           options={({route}) => ({ title: `Login as ${route.params.role}` })}
           />
+          
         </Stack.Navigator>
       </NavigationContainer>
   );
