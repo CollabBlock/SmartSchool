@@ -4,7 +4,16 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
+import { Colors, Typography, Spacings } from 'react-native-ui-lib';
+import {TextField} from 'react-native-ui-lib';
+
+
+import { useNavigation } from '@react-navigation/native';
+
 const Login = ({ route }) => {
+
+  const navigation = useNavigation();
+
   const role = route.params.role;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +43,32 @@ const Login = ({ route }) => {
         console.log('User data retrieved:', userData);
 
         if (userData.role === role) {
-          Alert.alert('Success', `User signed in as ${userData.role}`);
+          // Alert.alert('Success', `User signed in as ${userData.role}`);
+          
+
+          // if admin, navigate to AdminDashboard
+          // clear the stack and navigate to the AdminDashboard
+          if (role === 'admin') {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'AdminDashboard' }],
+            });
+          } else if (role === 'teacher'){
+            // if teacher, navigate to TeacherDashboard
+            // clear the stack and navigate to the TeacherDashboard
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'TeacherDashboard' }],
+            });
+          } else {
+            // if student, navigate to StudentDashboard
+            // clear the stack and navigate to the StudentDashboard
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'StudentDashboard' }],
+            });
+          }
+
         } else {
           Alert.alert('Error', `User role mismatch: expected ${role}, but found ${userData.role}`);
           await auth().signOut();
@@ -57,26 +91,44 @@ const Login = ({ route }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Icon style={styles.logo} name="school" size={60} color="#3cb371" />
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
+        {/* <Text style={styles.label}>Email</Text> */}
+        <TextField
           value={username}
           onChangeText={setUsername}
-          style={styles.input}
           placeholder="Enter your email"
-          placeholderTextColor='#999'
-          keyboardType="email-address"
+          // color= '#3cb371'
           autoCapitalize="none"
+          validate={'email'}
+          validationMessage={['Field is required', 'Email is invalid',]}
+          errormessage="Please enter a valid email"
+          floatingPlaceholder
+          enableErrors
+          showCharCounter
+          floatOnFocus
+          floatingPlaceholderColor={{focus: '#3cb371', error: '#E63B2E'}}
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
+        {/* <Text style={styles.label}>Password</Text> */}
+        <TextField
           value={password}
           onChangeText={setPassword}
-          style={styles.input}
+          // style={styles.input}
+          // color= '#3cb371'
           placeholder="Enter your password"
           placeholderTextColor='#999'
           secureTextEntry
+          validate={['required', 'password', (value) => value.length > 6]}
+          validationMessage={['Field is required', 'Email is invalid',]}
+          floatingPlaceholder
+          enableErrors
+          showCharCounter
+          maxLength={30}
+          floatOnFocus
+          floatingPlaceholderColor={{focus: '#3cb371', error: '#E63B2E'}}
+
+
+
         />
       </View>
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
@@ -95,7 +147,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f0ffff',
+    backgroundColor: '#FAF9F6',
   },
   logo: {
     textAlign: 'center',
@@ -110,6 +162,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginBottom: 15,
+    // borderBottomColor: '#ccc',
+    // borderBottomWidth: 1,
   },
   label: {
     fontSize: 14,
@@ -119,11 +173,11 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    color: '#000',
+    // borderColor: '#ccc',
+    // borderRadius: 5,
+    // paddingVertical: 8,
+    // paddingHorizontal: 12,
+    // color: '#000',
   },
   button: {
     backgroundColor: '#3cb371',
