@@ -9,6 +9,9 @@ import BottomNavigator from './screens/Admin/BottomNavigator';
 import AddStudentScreen from './screens/Admin/AddStudentScreen';
 import EditStudentScreen from './screens/Admin/EditStudentScreen';
 
+import TeacherDashboard from './screens/Teacher/TeacherDasboard';
+import StudentDashboard from './screens/Student/StudentDashboard';
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -55,6 +58,18 @@ const App = () => {
           name="EditStudent" 
           component={EditStudentScreen} 
           options={{ title: 'Edit Student' }}
+        />
+
+        <Stack.Screen
+          name="TeacherDashboard"
+          component={TeacherDashboard}
+          options={{ title: 'Teacher Dashboard' }}
+        />
+
+        <Stack.Screen
+          name="StudentDashboard"
+          component={StudentDashboard}
+          options={{ title: 'Student Dashboard' }}
         />
           
         </Stack.Navigator>

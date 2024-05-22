@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
 import { TextField, Colors, Typography, Text } from 'react-native-ui-lib';
 
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import firestore from '@react-native-firebase/firestore';
+
 
 
 const AddStudentScreen = () => {
@@ -25,25 +27,47 @@ const AddStudentScreen = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
 
-  const handleAddStudent = () => {
-    // Add your form submission logic here
-    console.log('Student Added:', {
-      registrationNumber,
-      dateOfAdmission,
-      name,
-      dateOfBirth,
-      gender,
-      fatherName,
-      caste,
-      occupation,
-      residence,
-      admissionClass,
-      email,
-      password,
-      remarks,
-    });
-  };
+  const handleAddStudent = async () => {
+    if (
+      !registrationNumber ||
+      !dateOfAdmission ||
+      !name ||
+      !dateOfBirth ||
+      !gender ||
+      !fatherName ||
+      !caste ||
+      !occupation ||
+      !residence ||
+      !admissionClass ||
+      !email ||
+      !password
+    ) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
 
+    try {
+      await firestore().collection('students').doc(registrationNumber.toString()).set({
+        registrationNumber: parseInt(registrationNumber, 10),
+        dateOfAdmission,
+        name,
+        dateOfBirth,
+        gender,
+        fatherName,
+        caste,
+        occupation,
+        residence,
+        admissionClass,
+        email,
+        password,
+        remarks,
+      });
+      Alert.alert('Success', 'Student added successfully!');
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.error('Error adding student:', error);
+    }
+  };
 
 
   const showDatePicker = () => {

@@ -45,11 +45,29 @@ const Login = ({ route }) => {
         if (userData.role === role) {
           // Alert.alert('Success', `User signed in as ${userData.role}`);
           
+
+          // if admin, navigate to AdminDashboard
           // clear the stack and navigate to the AdminDashboard
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'AdminDashboard', params: { user: userData } }],
-          });
+          if (role === 'admin') {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'AdminDashboard' }],
+            });
+          } else if (role === 'teacher'){
+            // if teacher, navigate to TeacherDashboard
+            // clear the stack and navigate to the TeacherDashboard
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'TeacherDashboard' }],
+            });
+          } else {
+            // if student, navigate to StudentDashboard
+            // clear the stack and navigate to the StudentDashboard
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'StudentDashboard' }],
+            });
+          }
 
         } else {
           Alert.alert('Error', `User role mismatch: expected ${role}, but found ${userData.role}`);

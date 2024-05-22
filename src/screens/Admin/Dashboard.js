@@ -1,16 +1,33 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { Text, Card } from 'react-native-ui-lib';
 import { BarChart } from 'react-native-chart-kit';
+import firestore from '@react-native-firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
 const DashboardScreen = () => {
-  const studentCount = 120;
-  const teacherCount = 15;
+  const [studentCount, setStudentCount] = useState(0);
+  const [teacherCount, setTeacherCount] = useState(15); // Example static data for teachers
   const revenue = 5000; // Example revenue data
   const averageAttendance = 92; // Example average attendance percentage
   const studentsPerClass = [30, 25, 20, 15, 30, 22, 28, 24, 26, 20]; // Example students in each class
+
+  const fetchStudentCount = async () => {
+    try {
+      const studentsCollection = await firestore().collection('students').get();
+      setStudentCount(studentsCollection.size);
+    } catch (error) {
+      console.error("Error fetching student count: ", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchStudentCount();
+    }, [])
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
