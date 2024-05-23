@@ -1,13 +1,16 @@
-import React, { useState, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Colors, View, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { Text, Card } from 'react-native-ui-lib';
 import { BarChart } from 'react-native-chart-kit';
 import firestore from '@react-native-firebase/firestore';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import auth from '@react-native-firebase/auth';
 
 const screenWidth = Dimensions.get('window').width;
 
 const DashboardScreen = () => {
+  const navigation = useNavigation();
   const [studentCount, setStudentCount] = useState(0);
   const [teacherCount, setTeacherCount] = useState(15); // Example static data for teachers
   const revenue = 5000; // Example revenue data
@@ -29,8 +32,35 @@ const DashboardScreen = () => {
     }, [])
   );
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+          <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  const handleLogout = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'RoleSelection' }],
+        });
+      })
+      .catch(error => {
+        console.error('Error during sign out:', error);
+      });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.welcomeText}>Welcome Back!</Text>
+      <Text style={styles.subText}>Admin, SmartSchool</Text>
+
       <View style={styles.row}>
         <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Students screen')}>
           <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
@@ -90,7 +120,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F9F6EE', // light gray background
+    backgroundColor: '#ffffff' // Mint cream
+  },
+  welcomeText: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    // textAlign: 'center',
+    marginBottom: 5,
+    color: '#3cb371', // Green color for text
+  },
+  subText: {
+    fontSize: 20,
+    // textAlign: 'center',
+    marginBottom: 30,
+    color: '#000000', // Black color for text
   },
   row: {
     flexDirection: 'row',
@@ -99,7 +142,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: (screenWidth / 2) - 25, // Adjust width to fit two cards per row
-    backgroundColor: '#ffffff', // White background for cards
+    backgroundColor: '#F2F2F2', // White background for cards
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#3cb371', // Green border
@@ -127,6 +170,9 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 8,
     borderRadius: 16,
+  },
+  headerButton: {
+    marginRight: 15,
   },
 });
 

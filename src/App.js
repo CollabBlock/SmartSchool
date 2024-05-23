@@ -6,8 +6,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AdminDashboard from './screens/Admin/DeprecatedDashboard';
 import BottomNavigator from './screens/Admin/BottomNavigator';
-import AddStudentScreen from './screens/Admin/AddStudentScreen';
-import EditStudentScreen from './screens/Admin/EditStudentScreen';
+import AddStudentScreen from './screens/Admin/Students/AddStudentScreen';
+import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
 
 import TeacherDashboard from './screens/Teacher/TeacherDasboard';
 import StudentDashboard from './screens/Student/StudentDashboard';

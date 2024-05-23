@@ -1,10 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import DashboardScreen from './Dashboard';
-import StudentsScreen from './StudentsScreen';
-import TeachersScreen from './TeachersScreen';
-import BillingScreen from './BillingScreen';
-
+import StudentsScreen from './Students/StudentsScreen';
+import TeachersScreen from './Teachers/TeachersScreen';
+import FeeScreen from './Fees/FeeScreen';
+import ClassesScreen from './Classes/ClassesScreen';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -16,6 +16,18 @@ const BottomNavigator = () => {
     screenOptions={{
       tabBarActiveTintColor: '#3cb371',
       tabBarInactiveTintColor: '#222',
+      headerTitleAlign: 'center',
+      headerStyle: {
+        backgroundColor: '#3cb371',
+        // borderWidth: 1,
+        // borderBottomColor: '#000000',
+        // color: '#fffff',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 20,
+      },
       labelStyle: {
         fontSize: 14,
         fontWeight: 'bold',
@@ -36,7 +48,7 @@ const BottomNavigator = () => {
       }}
       
       />
-      <Tab.Screen name="Students" component={StudentsScreen} 
+      <Tab.Screen name="Manage Students" component={StudentsScreen} 
         options={{
           tabBarLabel: 'Students',
           tabBarIcon: ({ color, size }) => (
@@ -44,7 +56,18 @@ const BottomNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen name="Teachers" component={TeachersScreen} 
+
+      <Tab.Screen name="Manage Classes" component={ClassesScreen}
+        options={{
+          tabBarLabel: 'Classes',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="google-classroom" color={color} size={size} />
+          ),
+      }}
+      />
+
+
+      <Tab.Screen name="Manage Teachers" component={TeachersScreen} 
         options={{
           tabBarLabel: 'Teachers',
           tabBarIcon: ({ color, size }) => (
@@ -52,9 +75,9 @@ const BottomNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen name="Billing" component={BillingScreen}
+      <Tab.Screen name="Fee" component={FeeScreen}
         options={{
-          tabBarLabel: 'Billing',
+          tabBarLabel: 'Fee',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="credit-card" color={color} size={size} />
           ),
