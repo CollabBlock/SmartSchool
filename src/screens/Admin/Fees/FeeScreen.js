@@ -3,10 +3,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const BillingScreen = () => {
+const FeeScreen = () => {
     return (
         <View style={styles.container}>
-        <Text style={styles.text} >Billing Screen</Text>
+        <Text style={styles.text} >Fee Screen</Text>
         </View>
     );
     }
@@ -24,4 +24,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default BillingScreen;
+export default FeeScreen;

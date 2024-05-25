@@ -9,18 +9,18 @@ import firestore from '@react-native-firebase/firestore';
 
 
 const AddStudentScreen = () => {
-  const [registrationNumber, setRegistrationNumber] = useState('');
-  const [dateOfAdmission, setDateOfAdmission] = useState('');
+  const [id, setID] = useState('');
+  const [admissionDate, setAdmissionDate] = useState('');
   const [name, setName] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dob, setdob] = useState('');
   const [gender, setGender] = useState('');
   const [fatherName, setFatherName] = useState('');
-  const [caste, setCaste] = useState('');
+  const [cast, setCast] = useState('');
   const [occupation, setOccupation] = useState('');
   const [residence, setResidence] = useState('');
-  const [admissionClass, setAdmissionClass] = useState('');
+  const [admclass, setClass] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // const [password, setPassword] = useState('');
   const [remarks, setRemarks] = useState('');
 
 
@@ -29,37 +29,37 @@ const AddStudentScreen = () => {
 
   const handleAddStudent = async () => {
     if (
-      !registrationNumber ||
-      !dateOfAdmission ||
+      !id ||
+      !admissionDate ||
       !name ||
-      !dateOfBirth ||
+      !dob ||
       !gender ||
       !fatherName ||
-      !caste ||
+      !cast ||
       !occupation ||
       !residence ||
-      !admissionClass ||
-      !email ||
-      !password
+      !admclass ||
+      !email
+      // !password
     ) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
 
     try {
-      await firestore().collection('students').doc(registrationNumber.toString()).set({
-        registrationNumber: parseInt(registrationNumber, 10),
-        dateOfAdmission,
+      await firestore().collection('students').doc(id.toString()).set({
+        id: parseInt(id, 10),
+        admissionDate,
         name,
-        dateOfBirth,
+        dob,
         gender,
         fatherName,
-        caste,
+        cast,
         occupation,
         residence,
-        admissionClass,
+        admclass,
         email,
-        password,
+        // password,
         remarks,
       });
       Alert.alert('Success', 'Student added successfully!');
@@ -85,11 +85,11 @@ const AddStudentScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Add New Student</Text>
+      {/* <Text style={styles.title}>Add New Student</Text> */}
       <View style={styles.inputContainer}>
         <TextField
-          value={registrationNumber}
-          onChangeText={setRegistrationNumber}
+          value={id}
+          onChangeText={setID}
           placeholder="Registration Number"
           floatingPlaceholder
           keyboardType="numeric"
@@ -107,8 +107,8 @@ const AddStudentScreen = () => {
       </View>
       <View style={styles.inputContainer}>
         <TextField
-          value={dateOfAdmission}
-          onChangeText={setDateOfAdmission}
+          value={admissionDate}
+          onChangeText={setAdmissionDate}
           placeholder="Date of Admission"
           floatingPlaceholder
           floatOnFocus
@@ -155,8 +155,8 @@ const AddStudentScreen = () => {
       </View>
       <View style={styles.inputContainer}>
         <TextField
-          value={dateOfBirth}
-          onChangeText={setDateOfBirth}
+          value={dob}
+          onChangeText={setdob}
           placeholder="Date of Birth"
           floatingPlaceholder
           floatOnFocus
@@ -209,8 +209,8 @@ const AddStudentScreen = () => {
       </View>
       <View style={styles.inputContainer}>
         <TextField
-          value={caste}
-          onChangeText={setCaste}
+          value={cast}
+          onChangeText={setCast}
           placeholder="Caste"
           floatingPlaceholder
           floatOnFocus
@@ -263,8 +263,8 @@ const AddStudentScreen = () => {
       </View>
       <View style={styles.inputContainer}>
         <TextField
-          value={admissionClass}
-          onChangeText={setAdmissionClass}
+          value={admclass}
+          onChangeText={setClass}
           placeholder="Admission Class"
           floatingPlaceholder
           floatOnFocus
@@ -298,7 +298,7 @@ const AddStudentScreen = () => {
           underlineColor={{ focus: '#3cb371', error: '#E63B2E' }}
         />
       </View>
-      <View style={styles.inputContainer}>
+      {/* <View style={styles.inputContainer}>
         <TextField
           value={password}
           onChangeText={setPassword}
@@ -316,7 +316,7 @@ const AddStudentScreen = () => {
           validationMessagePosition="bottom"
           underlineColor={{ focus: '#3cb371', error: '#E63B2E' }}
         />
-      </View>
+      </View> */}
       <View style={styles.inputContainer}>
         <TextField
           value={remarks}

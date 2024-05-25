@@ -40,6 +40,9 @@ const StudentsScreen = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.listItem}>
+      {/* // lets add profile image here */}
+      <MaterialCommunityIcons name="account-circle" size={40} color={'#3cb371'} style={styles.profilePic}/>
+
       <TouchableOpacity
         onPress={() => navigation.navigate('EditStudent', { studentId: item.key })}
         style={styles.listItemContent}
@@ -59,15 +62,22 @@ const StudentsScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View  style={styles.searchBar} >
       <TextField
-        placeholder="Search by name or registration number"
+        placeholder="🔎 Search by name or registration number"
         value={search}
         onChangeText={setSearch}
         floatingPlaceholder
         floatOnFocus
-        style={styles.searchBar}
+        containerStyle={styles.searchText}
         floatingPlaceholderColor={{ focus: Colors.green30 }}
+        // centered
+        // fieldStyle={{ color: Colors.grey60, borderColor: Colors.grey60}}
       />
+      {/* // lets a cross icon to clear the search field */}
+      <MaterialCommunityIcons name="close" size={20} color={Colors.grey20} onPress={() => setSearch('')} style={styles.clearSearch}/>
+
+      </View>
       <FlatList
         data={filteredStudents}
         renderItem={renderItem}
@@ -77,7 +87,7 @@ const StudentsScreen = () => {
         style={styles.addButton}
         onPress={() => navigation.navigate('AddStudent')}
       >
-        <MaterialCommunityIcons name="plus" size={30} color="#fff" />
+        <MaterialCommunityIcons name="plus" size={30} color="#fff"  />
       </TouchableOpacity>
     </View>
   );
@@ -90,11 +100,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   searchBar: {
+    flexDirection: 'row',
     marginBottom: 15,
-    borderRadius: 5,
-    border: 1,
-    borderColor: '#000000',
+    // borderRadius: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    // borderWidth: 1,
+    // paddingHorizontal: 35,
+    borderColor: Colors.grey50,
   },
+
+  clearSearch: {
+    position: 'absolute',
+    right: 15,
+    top: 20,
+  },
+
+  searchText: {
+    flex: 1,
+    // backgroundColor: 'red',
+    // borderWidth: 1,
+    // borderColor: Colors.grey50,
+    paddingLeft: 10,
+    marginLeft: 7,
+
+  },
+  profilePic: {
+    marginRight: 10,
+  },
+
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -102,11 +136,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderBottomWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.grey60,
+    borderWidth: 1,
+    borderColor: Colors.grey50,
     marginVertical: 5,
-    borderRadius: 5,
-    backgroundColor: '#D4FFEA',
+    borderRadius: 10,
+    backgroundColor: '#F2F2F2',
   },
   listItemContent: {
     flex: 1,
@@ -118,7 +152,7 @@ const styles = StyleSheet.create({
   listItemSubText: {
     fontSize: 14,
     color: Colors.grey40,
-    marginTop: 4,
+    marginTop: 3,
   },
   deleteButton: {
     marginLeft: 10,
