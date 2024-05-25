@@ -36,23 +36,23 @@ const ClassesScreen = () => {
       />
       <View style={styles.cardBody}>
         <Text style={styles.subjectText}>English:</Text>
-        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.English })}>View Syllabus</Text>
+        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.English })}>View</Text>
       </View>
       <View style={styles.cardBody}>
         <Text style={styles.subjectText}>General Knowledge:</Text>
-        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item['General Knowledge'] })}>View Syllabus</Text>
+        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item['General Knowledge'] })}>View</Text>
       </View>
       <View style={styles.cardBody}>
         <Text style={styles.subjectText}>Islamyat:</Text>
-        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.Islamyat })}>View Syllabus</Text>
+        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.Islamyat })}>View</Text>
       </View>
       <View style={styles.cardBody}>
         <Text style={styles.subjectText}>Math:</Text>
-        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.Math })}>View Syllabus</Text>
+        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.Math })}>View</Text>
       </View>
       <View style={styles.cardBody}>
         <Text style={styles.subjectText}>Urdu:</Text>
-        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.Urdu })}>View Syllabus</Text>
+        <Text style={styles.subjectLink} onPress={() => navigation.navigate('ViewImage', { uri: item.Urdu })}>View</Text>
       </View>
       <View style={styles.cardBody}>
         <Text style={styles.subjectText}>Timetable:</Text>
