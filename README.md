@@ -1,79 +1,85 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-# Getting Started
+# SmartSchool
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Overview
+SmartSchool is a comprehensive mobile application designed to streamline school management operations. Developed using React Native and Firebase, SmartSchool provides a robust platform for managing students, teachers, classes, fees, and academic schedules efficiently.
 
-## Step 1: Start the Metro Server
+<img width="389" alt="image" src="https://github.com/CollabBlock/SmartSchool/assets/91197082/98b86011-530e-422f-973d-3e5ca133cdb8">
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Features
+- **User Authentication**: Secure login for Admin, Teacher, and Student roles using Firebase Authentication.
+- **Student Management**: Admin can add, view, update, and delete student records, including registration details, personal information, and academic data.
+- **Teacher Management**: Admin can assign and reassign classes to teachers, and manage teacher records.
+- **Class Management**: Admin can upload and remove timetables and syllabi, and view class schedules.
+- **Fee Management**: Admin can manage fee records, including the amount due, amount paid, and payment dates.
+- **Real-Time Updates**: Utilizes Firestore for real-time data synchronization across all users.
+- **Interactive Dashboards**: Visualize data through interactive charts and graphs to enhance decision-making.
 
-```bash
-# using npm
-npm start
+## Technology Stack
+- **Frontend**: React Native
+- **Backend**: Firebase Firestore
+- **Authentication**: Firebase Authentication
+- **Storage**: Firebase Storage
 
-# OR using Yarn
-yarn start
-```
+## Installation
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/CollabBlock/SmartSchool.git
+    cd SmartSchool
+    ```
 
-## Step 2: Start your Application
+2. **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+3. **Setup Firebase**:
+    - Create a Firebase project in the [Firebase Console](https://console.firebase.google.com/).
+    - Add your app to the Firebase project.
+    - Download the `google-services.json` file for Android and `GoogleService-Info.plist` file for iOS and place them in the appropriate directories.
 
-### For Android
+4. **Link dependencies** (if not using auto-linking):
+    ```bash
+    npx react-native link
+    ```
 
-```bash
-# using npm
-npm run android
+5. **Run the app**:
+    - For Android:
+        ```bash
+        npx react-native run-android
+        ```
+    - For iOS:
+        ```bash
+        cd ios
+        pod install
+        cd ..
+        npx react-native run-ios
+        ```
 
-# OR using Yarn
-yarn android
-```
+## Usage
+1. **Admin Login**: Use the provided admin credentials to login and manage school operations.
+2. **Teacher and Student Login**: Use the credentials assigned by the admin to access specific functionalities.
 
-### For iOS
+## Screenshots
+<img width="393" alt="image" src="https://github.com/CollabBlock/SmartSchool/assets/91197082/ad7d8320-aa80-41b3-ab5b-dbda8f34a24e">
 
-```bash
-# using npm
-npm run ios
+<img width="390" alt="image" src="https://github.com/CollabBlock/SmartSchool/assets/91197082/8ec4c213-479f-43b5-a16c-fa3d11c904c2">
 
-# OR using Yarn
-yarn ios
-```
+<img width="390" alt="image" src="https://github.com/CollabBlock/SmartSchool/assets/91197082/8da00e53-c9d0-4ccd-b276-1b489b5ae588">
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
 
-## Step 3: Modifying your App
 
-Now that you have successfully run the app, let's modify it.
+## Contributing
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+## License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+## Contact
+For any inquiries or support, please contact [your-email@example.com](mailto:your-email@example.com).
 
-## Congratulations! :tada:
+---
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+This `README.md` provides a comprehensive overview of the SmartSchool project, including features, installation steps, usage, and contact information. Adjust the paths and links to match your project structure and repository.
