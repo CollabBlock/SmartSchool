@@ -1,15 +1,59 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const RoleSelectionScreen = () => {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        setLoading(true);
+        try {
+          const querySnapshot = await firestore().collection('Users').where('email', '==', user.email).get();
+          if (!querySnapshot.empty) {
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+            const role = userData.role;
+            const destination = role === 'admin' ? 'AdminDashboard' : role === 'teacher' ? 'TeacherDashboard' : 'StudentDashboard';
+            navigation.reset({
+              index: 0,
+              routes: [{ name: destination }],
+            });
+          } else {
+            Alert.alert('Error', 'User data not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          Alert.alert('Error', 'Something went wrong');
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigation]);
 
   const handleRoleSelect = (role) => {
     console.log(`Selected role: ${role}`);
     navigation.navigate('Login', { role });
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>Checking auth status...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
