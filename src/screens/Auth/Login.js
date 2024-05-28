@@ -73,6 +73,7 @@ const Login = ({ route }) => {
           floatingPlaceholderColor={{ focus: '#3cb371', error: '#E63B2E' }}
           validateOnChange
           validationMessagePosition={'bottom'}
+          style={{ borderBottomWidth: 1, borderBottomColor: '#3cb371', }}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -91,6 +92,8 @@ const Login = ({ route }) => {
           floatingPlaceholderColor={{ focus: '#3cb371', error: '#E63B2E' }}
           validateOnChange
           validationMessagePosition={'bottom'}
+          style={{ borderBottomWidth: 1, borderBottomColor: '#3cb371', }}
+
         />
       </View>
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
