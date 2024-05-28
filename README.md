@@ -74,12 +74,6 @@ SmartSchool is a comprehensive mobile application designed to streamline school 
 ## Contributing
 We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
 ## Contact
-For any inquiries or support, please contact [your-email@example.com](mailto:your-email@example.com).
+For any inquiries or support, please contact [fareh.iqbal55@gmail.com.com](mailto:fareh.iqbal55@gmail.com).
 
----
-
-This `README.md` provides a comprehensive overview of the SmartSchool project, including features, installation steps, usage, and contact information. Adjust the paths and links to match your project structure and repository.
