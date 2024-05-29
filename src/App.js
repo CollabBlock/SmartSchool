@@ -9,6 +9,8 @@ import BottomNavigator from './screens/Admin/BottomNavigator';
 import AddStudentScreen from './screens/Admin/Students/AddStudentScreen';
 import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
 import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
+import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
+
 
 import TeacherDashboard from './screens/Teacher/TeacherDasboard';
 import StudentDashboard from './screens/Student/StudentDashboard';
@@ -80,7 +82,13 @@ const App = () => {
           component={AddTeacherScreen}
           options={{ title: 'Add New Teacher' }}
         />
-          
+
+        <Stack.Screen
+          name="ViewReport"
+          component={FullReportScreen}
+          options={{ title: 'View Full Report' }}
+        />
+
         </Stack.Navigator>
       </NavigationContainer>
   );
