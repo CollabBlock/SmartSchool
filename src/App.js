@@ -8,10 +8,15 @@ import AdminDashboard from './screens/Admin/DeprecatedDashboard';
 import BottomNavigator from './screens/Admin/BottomNavigator';
 import AddStudentScreen from './screens/Admin/Students/AddStudentScreen';
 import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
+import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
+import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
+
 
 import TeacherDashboard from './screens/Teacher/TeacherDasboard';
 import StudentDashboard from './screens/Student/StudentDashboard';
 import TeacherButtomNavigator from './screens/Teacher/TeacherButtomNavigator';
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -72,7 +77,19 @@ const App = () => {
           component={StudentDashboard}
           options={{ title: 'Student Dashboard' }}
         />
-          
+
+        <Stack.Screen
+          name="AddTeacher"
+          component={AddTeacherScreen}
+          options={{ title: 'Add New Teacher' }}
+        />
+
+        <Stack.Screen
+          name="ViewReport"
+          component={FullReportScreen}
+          options={{ title: 'View Full Report' }}
+        />
+
         </Stack.Navigator>
       </NavigationContainer>
   );
