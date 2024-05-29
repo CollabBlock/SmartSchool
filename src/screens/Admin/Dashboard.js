@@ -1,11 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Colors, View, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import { Text, Card } from 'react-native-ui-lib';
+import { Colors, View, ScrollView, StyleSheet, Dimensions, TouchableOpacity, PermissionsAndroid, Platform, Alert} from 'react-native';
+import { Text, Card, Button } from 'react-native-ui-lib';
 import { PieChart, StackedBarChart } from 'react-native-chart-kit';
 import firestore from '@react-native-firebase/firestore';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import auth from '@react-native-firebase/auth';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import Share from 'react-native-share';
+import { captureRef } from 'react-native-view-shot';
+
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -15,6 +19,7 @@ const DashboardScreen = () => {
   const [teacherCount, setTeacherCount] = useState(0);
   const [ageGroupsData, setAgeGroupsData] = useState([]);
   const [studentsPerClass, setStudentsPerClass] = useState([]);
+  const [averagePercentagePerClass, setAveragePercentagePerClass] = useState([10, 20, 30, 14, 26, 34]);
 
   const fetchStudentCount = async () => {
     try {
@@ -166,13 +171,50 @@ const DashboardScreen = () => {
     return colors[index % colors.length]; 
   };
   
-  const pieChartData = studentsPerClass.map((value, index) => ({
-    name: getClassLabel(index),
-    population: value,
-    color: getClassColor(index),
-    legendFontColor: '#000',
-    legendFontSize: 15,
-  }));
+  const pieChartData = (data) => {
+      return data.map((value, index) => ({
+      name: getClassLabel(index),
+      population: value,
+      color: getClassColor(index),
+      legendFontColor: '#000',
+      legendFontSize: 15,
+    }))
+  };
+
+  const downloadPDF = async (htmlContent, fileName) => {
+    try {  
+      const options = {
+        html: htmlContent,
+        fileName: fileName,
+        directory: 'Documents',
+      };
+  
+      const file = await RNHTMLtoPDF.convert(options);
+      const filePath = 'file://' + file.filePath;
+      
+      // Share PDF via WhatsApp
+      const shareOptions = {
+        url: filePath,
+        type: 'application/pdf',
+        failOnCancel: false,
+      };
+  
+      await Share.open(shareOptions);
+    } catch (error) {
+      console.error('Error generating PDF: ', error);
+      Alert.alert('Error', 'Failed to generate or share PDF');
+    }
+  };
+
+  const handleDownloadPDF = (chartType, data) => {
+    const htmlContent = `<html>
+      <body>
+        <h1>${chartType}</h1>
+        <div id="chart">${JSON.stringify(data)}</div>
+      </body>
+    </html>`;
+    downloadPDF(htmlContent, `${chartType}_Report`);
+  };
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -187,57 +229,102 @@ const DashboardScreen = () => {
           <Card.Section content={[{ text: 'Total Teachers', text70: true, grey10: true }, { text: `${teacherCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
         </Card>
       </View>
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Students in Each Class</Text>
-        <PieChart
-          data={pieChartData}
-          width={screenWidth}
-          height={220}
-          chartConfig={{
-            backgroundColor: '#ffffff',
-            backgroundGradientFrom: '#ffffff',
-            backgroundGradientTo: '#ffffff',
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-          }}
-          accessor="population"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute 
-        />
-      </View>
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Total Boys and Girls in Each Age Group</Text>
-        <ScrollView horizontal={true}>
-          <StackedBarChart
-            data={{
-              labels: Object.keys(ageGroupsData),
-              legend: ['Boys', 'Girls'],
-              data: Object.values(ageGroupsData).map(data => [data.boys, data.girls]),
-              barColors: ['#3366ff', '#ff6699'], // Boys - Blue, Girls - Pink
-            }}
+
+      <Card style={styles.bigCard} flex activeOpacity={1}>
+        <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Students in Each Class</Text>
+          <PieChart
+            data={pieChartData(studentsPerClass)}
             width={screenWidth}
             height={220}
-            yAxisSuffix=""
-            yAxisInterval={1}
             chartConfig={{
               backgroundColor: '#ffffff',
               backgroundGradientFrom: '#ffffff',
               backgroundGradientTo: '#ffffff',
-              decimalPlaces: 0,
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               style: {
                 borderRadius: 16,
               },
             }}
-            style={styles.chart}
+            accessor="population"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute 
           />
-        </ScrollView>
-      </View>
+          <View style={styles.buttonsContainer}>
+            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport')} />
+            <Button label="Download as PDF" onPress={() => handleDownloadPDF('Students in Each Class', pieChartData(studentsPerClass))} />
+          </View>
+        </View>
+      </Card>
+      <Card style={styles.bigCard} flex activeOpacity={1}>
+        <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Total Boys and Girls in Each Age Group</Text>
+          <ScrollView horizontal={true}>
+            <StackedBarChart
+              data={{
+                labels: Object.keys(ageGroupsData),
+                legend: ['Boys', 'Girls'],
+                data: Object.values(ageGroupsData).map(data => [data.boys, data.girls]),
+                barColors: ['#3366ff', '#ff6699'], // Boys - Blue, Girls - Pink
+              }}
+              width={screenWidth}
+              height={220}
+              yAxisSuffix=""
+              yAxisInterval={1}
+              chartConfig={{
+                backgroundColor: '#ffffff',
+                backgroundGradientFrom: '#ffffff',
+                backgroundGradientTo: '#ffffff',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+              }}
+              // style={styles.chart}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute 
+            />
+          </ScrollView>
+          <View style={styles.buttonsContainer}>
+            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport')} />
+            <Button label="Download as PDF" onPress={() => handleDownloadPDF('Total Boys and Girls in Each Age Group', ageGroupsData)} />
+          </View>
+        </View>
+      </Card>
+      <Card style={styles.bigCard} flex activeOpacity={1}>
+        <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Average percentage in Each Class</Text>
+          <PieChart
+            data={pieChartData(averagePercentagePerClass)}
+            width={screenWidth}
+            height={220}
+            chartConfig={{
+              backgroundColor: '#ffffff',
+              backgroundGradientFrom: '#ffffff',
+              backgroundGradientTo: '#ffffff',
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+            }}
+            accessor="population"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute 
+          />
+          <View style={styles.buttonsContainer}>
+            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport')} />
+            <Button label="Download as PDF" onPress={() => handleDownloadPDF('Average percentage in Each Class', pieChartData(averagePercentagePerClass))} />
+          </View>
+        </View>
+      </Card>
     </ScrollView>
   );
 };
@@ -259,13 +346,13 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 20,
     // textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
     color: '#000000', // Black color for text
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   card: {
     width: (screenWidth / 2) - 25, // Adjust width to fit two cards per row
@@ -279,6 +366,19 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 3,
     margin: 5,
+  },
+  bigCard: {
+    width: (screenWidth) - 50, 
+    backgroundColor: '#F2F2F2',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#3cb371', // Green border
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+    marginBottom: 16,
   },
   cardContent: {
     alignItems: 'center',
@@ -297,6 +397,11 @@ const styles = StyleSheet.create({
   chart: {
     marginVertical: 8,
     borderRadius: 16,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
   },
   headerButton: {
     marginRight: 15,
