@@ -34,7 +34,7 @@
     "react-native-svg": "^15.3.0",
     "react-native-table-component": "^1.2.2",
     "react-native-ui-lib": "^7.22.0",
-    "react-native-vector-icons": "^10.1.0",
+    "react-native-vector-icons": "^10.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -86,7 +86,7 @@ const App = () => {
         <Stack.Screen
           name="ViewReport"
           component={FullReportScreen}
-          options={{ title: 'View Full Report' }}
+          options={{ title: 'Report' }}
         />
 
         </Stack.Navigator>

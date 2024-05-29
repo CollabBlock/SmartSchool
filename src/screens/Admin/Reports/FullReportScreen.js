@@ -38,7 +38,7 @@ const FullReportScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#FFF' },
-  headerContainer: { flexDirection: 'row', margin: 2 },
+  headerContainer: { flexDirection: 'row', margin: 2},
   headerText: { flex: 1, backgroundColor: '#3cb371', padding: 10, textAlign: 'center', borderWidth: 1, borderColor: '#000', color: '#fff', fontWeight: 'bold' },
   rowContainer: { flexDirection: 'row'},
   cellContainer: { flex: 1, borderWidth: 1, borderColor: '#000', padding: 10, backgroundColor: '#F2F2F2', margin: 2},

@@ -17,9 +17,9 @@ const DashboardScreen = () => {
   const [studentCount, setStudentCount] = useState(0);
   const [teacherCount, setTeacherCount] = useState(0);
   const [ageGroupsData, setAgeGroupsData] = useState([]);
-  const [studentsPerClass, setStudentsPerClass] = useState([]);
-  const [averagePercentagePerClass, setAveragePercentagePerClass] = useState([10, 20, 30, 14, 26, 34]);
-
+  const [studentsPerClass, setStudentsPerClass] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [marks, setMarks] = useState([]);
+  const [averagePercentagePerClass, setAveragePercentagePerClass] = useState([95, 90, 87, 89, 95, 92, 88, 85, 90, 92]);
 
   const fetchStudent = async () => {
     try {
@@ -65,10 +65,21 @@ const DashboardScreen = () => {
     }
   };
 
+  const fetchMarks = async () => {
+    try {
+      const marksSnapshot = await firestore().collection('marks').get();
+      const marksData = marksSnapshot.docs.map(doc => doc.data());
+      setMarks(marksData);
+    } catch (error) {
+      console.error("Error fetching marks: ", error);
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchStudent();
       fetchTeacherCount();
+      fetchMarks();
     }, [])
   );
 
@@ -240,8 +251,25 @@ const DashboardScreen = () => {
     "Reg No",
     "Name", 
     "Father Name", 
-    "Date of birth", 
-    "Age"
+    "Date of Birth", 
+    "Age",
+    "Gender"
+  ];
+
+  const headersForClass = [
+    "Reg No",
+    "Name", 
+    "Father Name", 
+    "Class"
+  ];
+
+  const headersForResult = [
+    "Reg No",
+    "Name", 
+    "Class",
+    "First",
+    "Mid",
+    "Final"
   ];
 
   const getDataForStudentReport = () => {
@@ -252,7 +280,8 @@ const DashboardScreen = () => {
         student.name,
         student.fatherName,
         formatDate(student.dob),
-        calculateYearNMonth(student.dob)
+        calculateYearNMonth(student.dob),
+        student.gender
       ];
   
       studentReportData.push(studentData);
@@ -269,6 +298,64 @@ const DashboardScreen = () => {
       }
     });
     return studentReportData;
+  };
+
+  const getDataForStudentInClassReport = () => {    
+    const classOrder = ["nursery", "prep", "1", "2", "3", "4", "5", "6", "7", "8"];
+    const studentReportData = [];
+    students.forEach(student => {
+      const studentData = [
+        student.id,
+        student.name,
+        student.fatherName,
+        student.class.toLowerCase()
+      ];
+      studentReportData.push(studentData);
+    });
+
+    studentReportData.sort((a, b) => {
+        const classA = a[3];
+        const classB = b[3];
+        return classOrder.indexOf(classA) - classOrder.indexOf(classB);
+    });
+
+    return studentReportData;
+  };
+  
+  const calculateCollectiveMark = (marks) => {
+    let collectiveMark = 0;
+    let i = 0;
+    Object.values(marks).forEach(mark => {
+      if (typeof mark === 'object') {
+        collectiveMark += (mark[0] + mark[1]);
+      } else {
+        collectiveMark += mark;
+      }
+      i++;
+    });
+    return (collectiveMark / i).toFixed(2);
+  };
+
+  const getStudentNameById = (id) => {
+    const student = students.find(student => student.id == id);
+    return student ? student.name : "John Doe";
+  };
+
+  const getDataForResultReport = () => {    
+    const resultReportData = [];
+    marks.forEach(result => {
+      const resultData = [
+        result.regNo,
+        getStudentNameById(result.regNo), 
+        result.class,
+        calculateCollectiveMark(result.first),
+        calculateCollectiveMark(result.mid),
+        calculateCollectiveMark(result.final)
+      ];
+      resultReportData.push(resultData);
+    });
+
+    return resultReportData;
   };
 
   return (
@@ -308,7 +395,7 @@ const DashboardScreen = () => {
             absolute 
           />
           <View style={styles.buttonsContainer}>
-            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentReport(), headers: headersForStudent})} />
+            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentInClassReport(), headers: headersForClass})} />
             <Button label="Download as PDF" onPress={() => handleDownloadPDF('Students in Each Class', pieChartData(studentsPerClass))} />
           </View>
         </View>
@@ -374,7 +461,7 @@ const DashboardScreen = () => {
             absolute 
           />
           <View style={styles.buttonsContainer}>
-            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport')} />
+            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForResultReport(), headers: headersForResult})} />
             <Button label="Download as PDF" onPress={() => handleDownloadPDF('Average percentage in Each Class', pieChartData(averagePercentagePerClass))} />
           </View>
         </View>
