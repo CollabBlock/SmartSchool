@@ -256,18 +256,20 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: 'start',
-        flex: 'row',
+        flexDirection: 'row',
         marginBottom: 20,
-
     },
     welcomeText: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: '#3cb371', // Green color
     },
     subText: {
         fontSize: 20,
         fontWeight: 'semibold',
+        marginTop: 8, //abhi dekhna hy isko
+        marginLeft: 10,
     },
     row: {
         flexDirection: 'row',

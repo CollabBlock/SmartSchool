@@ -12,9 +12,9 @@ import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
 import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
 
 
-import TeacherDashboard from './screens/Teacher/TeacherDasboard';
+import TeacherDashboard from './screens/Teacher/TeacherDashboard.js';
 import StudentDashboard from './screens/Student/StudentDashboard';
-import TeacherButtomNavigator from './screens/Teacher/TeacherButtomNavigator';
+import TeacherBottomNavigator from './screens/Teacher/TeacherBottomNavigator';
 
 
 
@@ -68,7 +68,7 @@ const App = () => {
 
         <Stack.Screen
           name="TeacherDashboard"
-          component={TeacherButtomNavigator}
+          component={TeacherBottomNavigator}
           options={{ title: 'Teacher Dashboard', headerShown: false}}
         />
 

@@ -6,7 +6,7 @@ import Marks from './Marks/TeacherMarks';
 import Remarks from './Remarks/TeacherRemarks';
 import Students from './Students/ManageStudents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Dashboard from './TeacherDasboard';
+import Dashboard from './TeacherDashboard';
 
 
 const Tab = createBottomTabNavigator();
@@ -14,42 +14,39 @@ const Tab = createBottomTabNavigator();
 const BottomNavigator = () => {
   return (
     <Tab.Navigator initialRouteName='Dashboard'
-    screenOptions={{
-      tabBarActiveTintColor: '#3cb371',
-      tabBarInactiveTintColor: '#222',
-      headerTitleAlign: 'center',
-      headerStyle: {
-        backgroundColor: '#3cb371',
-        // borderWidth: 1,
-        // borderBottomColor: '#000000',
-        // color: '#fffff',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-        fontSize: 20,
-      },
-      labelStyle: {
-        fontSize: 14,
-        fontWeight: 'bold',
-      },
-      style: {
-        backgroundColor: '#fff',
-      },
-    }}
+      screenOptions={{
+        tabBarActiveTintColor: '#3cb371',
+        tabBarInactiveTintColor: '#222',
+        headerTitleAlign: 'center',
+        headerStyle: {
+          backgroundColor: '#3cb371',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          fontSize: 20,
+        },
+        labelStyle: {
+          fontSize: 14,
+          fontWeight: 'bold',
+        },
+        style: {
+          backgroundColor: '#fff',
+        },
+      }}
     >
       <Tab.Screen name="Teacher Dasboard" component={Dashboard}
 
-      options={{
-        tabBarLabel: 'Dasboard',
-        
-        tabBarIcon: ({ color, size }) => (
-          <MaterialCommunityIcons name="view-dashboard" color={color} size={size} />
-        ),
-      }}
-      
+        options={{
+          tabBarLabel: 'Dasboard',
+
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="view-dashboard" color={color} size={size} />
+          ),
+        }}
+
       />
-       <Tab.Screen name="Manage Students" component={Students} 
+      <Tab.Screen name="Manage Students" component={Students}
         options={{
           tabBarLabel: 'Students',
           tabBarIcon: ({ color, size }) => (
@@ -66,7 +63,16 @@ const BottomNavigator = () => {
               <Path d="M10 15.5l-5-5 1.41-1.41L13 18.17l5-5 1.41 1.41z" fill={color} />
             </Svg>
           ),
-      }}
+        }}
+      />
+
+      <Tab.Screen name="Remarks" component={Remarks}
+        options={{
+          tabBarLabel: 'Remarks',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="comment" color={color} size={size} />
+          ),
+        }}
       />
     </Tab.Navigator>
   );
