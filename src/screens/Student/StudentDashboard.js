@@ -1,9 +1,36 @@
 // basic screen
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useEffect} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import auth from '@react-native-firebase/auth';
 
 const StudentDashboard = () => {
+    const navigation = useNavigation();
+    useEffect(() => {
+        navigation.setOptions({
+          headerRight: () => (
+            <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+              <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+            </TouchableOpacity>
+          ),
+        });
+      }, [navigation]);
+    
+      const handleLogout = () => {
+        auth()
+          .signOut()
+          .then(() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'RoleSelection' }],
+            });
+          })
+          .catch(error => {
+            console.error('Error during sign out:', error);
+          });
+      };
     return (
         <View style={styles.container}>
         <Text style={styles.text} >Ye ghareeb student</Text>
