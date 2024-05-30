@@ -117,13 +117,13 @@ const Marks = () => {
                             ...prevMarks,
                             [subject]: {
                                 ...prevMarks[subject],
-                                [part]: value,
+                                [part]: value === '' ? '' : Number(value),
                             }
                         };
                     } else {
                         return {
                             ...prevMarks,
-                            [subject]: value,
+                            [subject]: value === '' ? '' : Number(value),
                         };
                     }
                 });
@@ -183,14 +183,14 @@ const Marks = () => {
                         style={styles.input}
                         keyboardType="numeric"
                         onChangeText={value => handleMarksChange(subject, value, 'class')}
-                        value={marks[subject] ? marks[subject]['class'] : ''}
+                        value={marks[subject] && marks[subject]['class'] !== undefined ? marks[subject]['class'].toString() : ''}
                     />
                     <Text style={styles.label}>{subject} Lab Marks:</Text>
                     <TextInput
                         style={styles.input}
                         keyboardType="numeric"
                         onChangeText={value => handleMarksChange(subject, value, 'lab')}
-                        value={marks[subject] ? marks[subject]['lab'] : ''}
+                        value={marks[subject] && marks[subject]['lab'] !== undefined ? marks[subject]['lab'].toString() : ''}
                     />
                 </View>
             );
@@ -202,7 +202,7 @@ const Marks = () => {
                         style={styles.input}
                         keyboardType="numeric"
                         onChangeText={value => handleMarksChange(subject, value)}
-                        value={marks[subject] || ''}
+                        value={marks[subject] !== undefined ? marks[subject].toString() : ''}
                     />
                 </View>
             );
@@ -216,11 +216,10 @@ const Marks = () => {
                 <Picker
                     selectedValue={selectedStudentId}
                     style={styles.picker}
-                    onValueChange={(itemValue) => 
-                        {
-                            setSelectedStudentName('');
-                            return setSelectedStudentId(itemValue)}
-                        }
+                    onValueChange={(itemValue) => {
+                        setSelectedStudentName('');
+                        setSelectedStudentId(itemValue);
+                    }}
                 >
                     <Picker.Item label="Select a student" value="" />
                     {students.map(student => (
