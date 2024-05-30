@@ -14,8 +14,8 @@ import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
 
 import TeacherDashboard from './screens/Teacher/TeacherDasboard';
 import StudentDashboard from './screens/Student/StudentDashboard';
-
-
+import StudentBottomBar from './screens/Student/StudentBottomBar.js';
+import SubjectDetails from './screens/Student/SubjectDetails.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -73,9 +73,16 @@ const App = () => {
 
         <Stack.Screen
           name="StudentDashboard"
-          component={StudentDashboard}
-          options={{ title: 'Student Dashboard' }}
+          component={StudentBottomBar}
+          options={{ title: 'Student Dashboard', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="SubjectDetails" 
+          component={SubjectDetails} 
+          options={{ title: 'Subject Details' }}
+         />
+
 
         <Stack.Screen
           name="AddTeacher"
