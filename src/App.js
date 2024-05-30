@@ -10,6 +10,7 @@ import AddStudentScreen from './screens/Admin/Students/AddStudentScreen';
 import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
 import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
 import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
+import ViewMarks from './screens/Teacher/Students/ViewMarks.js';
 
 
 import TeacherDashboard from './screens/Teacher/TeacherDashboard.js';
@@ -63,6 +64,11 @@ const App = () => {
         <Stack.Screen 
           name="EditStudent" 
           component={EditStudentScreen} 
+          options={{ title: 'Edit Student' }}
+        />
+        <Stack.Screen 
+          name="ViewMarks" 
+          component={ViewMarks} 
           options={{ title: 'Edit Student' }}
         />
 

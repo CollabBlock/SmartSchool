@@ -76,7 +76,7 @@ const ManageStudents = () => {
             <MaterialCommunityIcons name="account-circle" size={40} color={'#3cb371'} style={styles.profilePic} />
 
             <TouchableOpacity
-                onPress={() => navigation.navigate('EditStudent', { studentId: item.key })}
+                onPress={() => navigation.navigate('ViewMarks', { studentId: item.key })}
                 style={styles.listItemContent}
             >
                 <Text style={styles.listItemText}>{item.name}</Text>

@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { useFocusEffect } from '@react-navigation/native';
 
-const MyComponent = () => {
+const Marks = () => {
     const [students, setStudents] = useState([]);
     const [selectedStudentId, setSelectedStudentId] = useState('');
     const [selectedStudentName, setSelectedStudentName] = useState('');
@@ -13,6 +13,7 @@ const MyComponent = () => {
     const [marks, setMarks] = useState({});
     const [subjects, setSubjects] = useState([]);
     const [teacherData, setTeacherData] = useState({});
+    const [submitted, setSubmitted] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -103,23 +104,32 @@ const MyComponent = () => {
         }
     };
 
-    const handleMarksChange = (subject, value, index = null) => {
+    const handleMarksChange = (subject, value, part = null) => {
         if (/^\d*$/.test(value)) { // Only allow numeric input
-            setMarks(prevMarks => {
-                if (index !== null) {
-                    const updatedSubjectMarks = Array.isArray(prevMarks[subject]) ? [...prevMarks[subject]] : [];
-                    updatedSubjectMarks[index] = value;
-                    return {
-                        ...prevMarks,
-                        [subject]: updatedSubjectMarks,
-                    };
-                } else {
-                    return {
-                        ...prevMarks,
-                        [subject]: value,
-                    };
-                }
-            });
+            const maxMarks = (selectedTerm === 'final')
+                ? (subject === 'Computer' ? (part === 'class' ? 70 : 30) : 100)
+                : (subject === 'Computer' ? (part === 'class' ? 35 : 15) : 50);
+
+            if (Number(value) <= maxMarks) {
+                setMarks(prevMarks => {
+                    if (part) {
+                        return {
+                            ...prevMarks,
+                            [subject]: {
+                                ...prevMarks[subject],
+                                [part]: value,
+                            }
+                        };
+                    } else {
+                        return {
+                            ...prevMarks,
+                            [subject]: value,
+                        };
+                    }
+                });
+            } else {
+                Alert.alert(`Invalid Marks`, `The maximum marks for ${subject} ${part ? part : ''} are ${maxMarks}.`);
+            }
         }
     };
 
@@ -127,9 +137,9 @@ const MyComponent = () => {
         try {
             const marksDocRef = firestore().collection('marks').doc(selectedStudentId);
             const marksDocSnapshot = await marksDocRef.get();
-    
+
             let updatedMarks;
-    
+
             if (marksDocSnapshot.exists) {
                 const marksDocData = marksDocSnapshot.data();
                 updatedMarks = {
@@ -146,12 +156,22 @@ const MyComponent = () => {
                     [selectedTerm]: marks
                 };
             }
-    
+
             await marksDocRef.set(updatedMarks, { merge: true });
             console.log('Marks submitted successfully');
+            setSubmitted(true);
         } catch (error) {
             console.error('Error submitting marks: ', error);
         }
+    };
+
+    const resetForm = () => {
+        setSelectedStudentId('');
+        setSelectedStudentName('');
+        setSelectedTerm('');
+        setMarks({});
+        setSubjects([]);
+        setSubmitted(false);
     };
 
     const renderMarksInput = (subject) => {
@@ -162,15 +182,15 @@ const MyComponent = () => {
                     <TextInput
                         style={styles.input}
                         keyboardType="numeric"
-                        onChangeText={value => handleMarksChange(subject, value, 0)}
-                        value={marks[subject] ? marks[subject][0] : ''}
+                        onChangeText={value => handleMarksChange(subject, value, 'class')}
+                        value={marks[subject] ? marks[subject]['class'] : ''}
                     />
                     <Text style={styles.label}>{subject} Lab Marks:</Text>
                     <TextInput
                         style={styles.input}
                         keyboardType="numeric"
-                        onChangeText={value => handleMarksChange(subject, value, 1)}
-                        value={marks[subject] ? marks[subject][1] : ''}
+                        onChangeText={value => handleMarksChange(subject, value, 'lab')}
+                        value={marks[subject] ? marks[subject]['lab'] : ''}
                     />
                 </View>
             );
@@ -190,18 +210,24 @@ const MyComponent = () => {
     };
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.label}>Select a Student ID:</Text>
-            <Picker
-                selectedValue={selectedStudentId}
-                style={styles.picker}
-                onValueChange={(itemValue) => setSelectedStudentId(itemValue)}
-            >
-                <Picker.Item label="Select a student" value="" />
-                {students.map(student => (
-                    <Picker.Item key={student.key} label={student.key} value={student.key} />
-                ))}
-            </Picker>
+            <View style={styles.pickerContainer}>
+                <Picker
+                    selectedValue={selectedStudentId}
+                    style={styles.picker}
+                    onValueChange={(itemValue) => 
+                        {
+                            setSelectedStudentName('');
+                            return setSelectedStudentId(itemValue)}
+                        }
+                >
+                    <Picker.Item label="Select a student" value="" />
+                    {students.map(student => (
+                        <Picker.Item key={student.key} label={student.key} value={student.key} />
+                    ))}
+                </Picker>
+            </View>
             {selectedStudentName ? (
                 <View style={styles.infoContainer}>
                     <Text style={styles.infoText}>Student Name: {selectedStudentName}</Text>
@@ -210,16 +236,18 @@ const MyComponent = () => {
             {selectedStudentId && (
                 <View style={styles.dropdownContainer}>
                     <Text style={styles.label}>Select Term:</Text>
-                    <Picker
-                        selectedValue={selectedTerm}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setSelectedTerm(itemValue)}
-                    >
-                        <Picker.Item label="Select a term" value="" />
-                        <Picker.Item label="First" value="first" />
-                        <Picker.Item label="Mid" value="mid" />
-                        <Picker.Item label="Final" value="final" />
-                    </Picker>
+                    <View style={styles.pickerContainer}>
+                        <Picker
+                            selectedValue={selectedTerm}
+                            style={styles.picker}
+                            onValueChange={(itemValue) => setSelectedTerm(itemValue)}
+                        >
+                            <Picker.Item label="Select a term" value="" />
+                            <Picker.Item label="First" value="first" />
+                            <Picker.Item label="Mid" value="mid" />
+                            <Picker.Item label="Final" value="final" />
+                        </Picker>
+                    </View>
                 </View>
             )}
             {selectedTerm && subjects.length > 0 && (
@@ -227,8 +255,15 @@ const MyComponent = () => {
                     {subjects.map(subject => renderMarksInput(subject))}
                 </View>
             )}
-            {selectedTerm && subjects.length > 0 && (
-                <Button title="Submit Marks" onPress={() => handleSubmit(selectedStudentId, selectedTerm, marks)} />
+            {selectedTerm && subjects.length > 0 && !submitted && (
+                <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit(selectedStudentId, selectedTerm, marks)}>
+                    <Text style={styles.submitButtonText}>Submit Marks</Text>
+                </TouchableOpacity>
+            )}
+            {submitted && (
+                <TouchableOpacity style={styles.resetButton} onPress={resetForm}>
+                    <Text style={styles.resetButtonText}>Enter Another Student's Marks</Text>
+                </TouchableOpacity>
             )}
         </ScrollView>
     );
@@ -236,24 +271,38 @@ const MyComponent = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         padding: 16,
-        marginBottom: 20, // Add margin to ensure the submit button is visible
+        backgroundColor: '#f8f9fa',
     },
     label: {
-        fontSize: 16,
+        fontSize: 18,
         marginBottom: 8,
+        color: '#333',
+    },
+    pickerContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        marginBottom: 16,
+        overflow: 'hidden',
     },
     picker: {
         height: 50,
         width: '100%',
-        marginBottom: 16,
     },
     infoContainer: {
         marginTop: 16,
+        padding: 16,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderColor: '#ccc',
+        borderWidth: 1,
     },
     infoText: {
         fontSize: 16,
+        color: '#555',
     },
     dropdownContainer: {
         marginTop: 16,
@@ -263,6 +312,11 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         marginBottom: 12,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        padding: 8,
     },
     input: {
         height: 40,
@@ -270,7 +324,32 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         paddingLeft: 8,
         marginTop: 8,
+        borderRadius: 8,
+    },
+    submitButton: {
+        marginTop: 16,
+        backgroundColor: '#28a745',
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    submitButtonText: {
+        color: '#fff',
+        fontSize: 18,
+    },
+    resetButton: {
+        marginTop: 16,
+        backgroundColor: '#007bff',
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    resetButtonText: {
+        color: '#fff',
+        fontSize: 18,
     },
 });
 
-export default MyComponent;
+export default Marks;
