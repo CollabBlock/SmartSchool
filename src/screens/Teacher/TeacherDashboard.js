@@ -80,7 +80,13 @@ const TeacherDashboard = () => {
 
             // Prepare chart data based on subjects
             const chartDatasets = subjects.map(subject => {
-                const subjectMarks = marksQuerySnapshot.docs.map(doc => doc.data()[term][subject]);
+                const subjectMarks = marksQuerySnapshot.docs.map(doc => {
+                    const data = doc.data()[term][subject];
+                    if (subject === 'Computer' && Array.isArray(data)) {
+                        return data[0] + data[1]; // Sum class and lab marks for Computer
+                    }
+                    return data;
+                });
 
                 let flattenedMarks = [];
                 subjectMarks.forEach(mark => {
@@ -124,8 +130,6 @@ const TeacherDashboard = () => {
             console.error("Error fetching marks data: ", error);
         }
     };
-
-
 
     useFocusEffect(
         useCallback(() => {
@@ -172,39 +176,40 @@ const TeacherDashboard = () => {
             <View style={styles.header}>
                 <Text style={styles.welcomeText}>Welcome</Text>
                 <Text style={styles.subText}>{teacherName}</Text>
-                {/* <Text style={styles.subText}>Class: {teacherClass}</Text> */}
             </View>
             <View style={styles.row}>
                 <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Total Students')}>
                     <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
                 </Card>
                 <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Tasks screen')}>
-                    <Card.Section content={[{ text: 'Total Tasks', text70: true, grey10: true }, { text: `${taskCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
+                    <Card.Section content={[{ text: 'Class', text70: true, grey10: true }, { text: `${teacherClass}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
                 </Card>
             </View>
-            <View style={styles.dropdown}>
-                <Text>Select Term:</Text>
-                <Picker
-                    selectedValue={selectedTerm}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => handleTermChange(itemValue)}
-                >
-                    <Picker.Item label="First Term" value="first" />
-                    <Picker.Item label="Mid Term" value="mid" />
-                    <Picker.Item label="Final Term" value="final" />
-                </Picker>
-            </View>
-            <View style={styles.dropdown}>
-                <Text>Select Data Type:</Text>
-                <Picker
-                    selectedValue={selectedDataType}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => handleDataTypeChange(itemValue)}
-                >
-                    <Picker.Item label="Average" value="average" />
-                    <Picker.Item label="Highest" value="highest" />
-                    <Picker.Item label="Lowest" value="lowest" />
-                </Picker>
+            <View style={styles.dropdownContainer}>
+                <View style={styles.dropdownRow}>
+                    <Text style={styles.dropdownLabel}>Select Term:</Text>
+                    <Picker
+                        selectedValue={selectedTerm}
+                        style={styles.picker}
+                        onValueChange={handleTermChange}
+                    >
+                        <Picker.Item label="First Term" value="first" />
+                        <Picker.Item label="Mid Term" value="mid" />
+                        <Picker.Item label="Final Term" value="final" />
+                    </Picker>
+                </View>
+                <View style={styles.dropdownRow}>
+                    <Text style={styles.dropdownLabel}>Select Data Type:</Text>
+                    <Picker
+                        selectedValue={selectedDataType}
+                        style={styles.picker}
+                        onValueChange={handleDataTypeChange}
+                    >
+                        <Picker.Item label="Average" value="average" />
+                        <Picker.Item label="Highest" value="highest" />
+                        <Picker.Item label="Lowest" value="lowest" />
+                    </Picker>
+                </View>
             </View>
             <View style={styles.chartContainer}>
                 <Text style={styles.chartTitle}>{`${selectedTerm.charAt(0).toUpperCase() + selectedTerm.slice(1)} Term Marks (${selectedDataType.charAt(0).toUpperCase() + selectedDataType.slice(1)})`}</Text>
@@ -296,13 +301,34 @@ const styles = StyleSheet.create({
     headerButton: {
         marginRight: 15,
     },
+
+    dropdownContainer: {
+        marginVertical: 15,
+        marginBottom: 20,
+    },
+    dropdownRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+
+    dropdownLabel: {
+        fontSize: 16,
+        color: '#333',
+    },
     dropdown: {
         marginVertical: 15,
         alignItems: 'center',
     },
     picker: {
         height: 50,
-        width: 200,
+        width: '60%',
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        borderColor: '#ccc',
+        borderWidth: 1,
+
     },
     chartContainer: {
         alignItems: 'center',

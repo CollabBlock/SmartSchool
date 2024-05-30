@@ -69,7 +69,7 @@ const App = () => {
         <Stack.Screen 
           name="ViewMarks" 
           component={ViewMarks} 
-          options={{ title: 'Edit Student' }}
+          options={{ title: 'Manage Student Marks' }}
         />
 
         <Stack.Screen
