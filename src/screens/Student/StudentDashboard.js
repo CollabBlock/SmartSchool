@@ -42,6 +42,30 @@ const StudentDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+          <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  const handleLogout = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'RoleSelection' }],
+        });
+      })
+      .catch(error => {
+        console.error('Error during sign out:', error);
+      });
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchStudentData();
@@ -166,6 +190,9 @@ const styles = StyleSheet.create({
   subjectButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  headerButton: {
+    marginRight: 15,
   },
 });
 
