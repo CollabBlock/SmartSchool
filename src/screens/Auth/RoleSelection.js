@@ -59,7 +59,6 @@ const RoleSelectionScreen = () => {
   return (
     <LinearGradient colors={['pink', '#2193b0']} style={styles.gradient}>
       <View style={styles.container}>
-        <Image source={require('C:/Users/Public/OneDrive - Higher Education Commission/SmartSchool/src/assets/images/Sms_Bg.png')} style={styles.logo} />
         <Text style={styles.title}>Choose Your Option</Text>
         <View style={styles.iconContainer}>
           <TouchableOpacity
