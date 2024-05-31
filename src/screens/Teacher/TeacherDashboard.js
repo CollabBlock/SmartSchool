@@ -263,7 +263,7 @@ const TeacherDashboard = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         padding: 20,
         marginTop: 0,
     },
@@ -273,8 +273,10 @@ const styles = StyleSheet.create({
     },
     welcomeText: {
         fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
+        fontWeight: 'bold',
+        color: '#000',
+        marginTop: 30,
+        marginBottom: 10,
     },
     subText: {
         color: '#3cb371',
