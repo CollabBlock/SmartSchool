@@ -11,12 +11,13 @@ import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
 import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
 import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
 import ViewMarks from './screens/Teacher/Students/ViewMarks.js';
-
-
+import ClassDetailScreen from './screens/Admin/Classes/ClassDetailScreen';
 import TeacherDashboard from './screens/Teacher/TeacherDashboard.js';
 import StudentDashboard from './screens/Student/StudentDashboard';
 import TeacherBottomNavigator from './screens/Teacher/TeacherBottomNavigator';
-
+import TimetableScreen from './screens/Admin/TimeTable/TimeTableScreen.js';
+import StudentBottomBar from './screens/Student/StudentBottomBar.js';
+import SubjectDetails from './screens/Student/SubjectDetails.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -80,9 +81,16 @@ const App = () => {
 
         <Stack.Screen
           name="StudentDashboard"
-          component={StudentDashboard}
-          options={{ title: 'Student Dashboard' }}
+          component={StudentBottomBar}
+          options={{ title: 'Student Dashboard', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="SubjectDetails" 
+          component={SubjectDetails} 
+          options={{ title: 'Subject Details' }}
+         />
+
 
         <Stack.Screen
           name="AddTeacher"
@@ -93,7 +101,19 @@ const App = () => {
         <Stack.Screen
           name="ViewReport"
           component={FullReportScreen}
-          options={{ title: 'View Full Report' }}
+          options={{ title: 'Report' }}
+        />
+
+        <Stack.Screen
+          name="ClassDetail"
+          component={ClassDetailScreen}
+          options={{ title: 'Class' }}
+        />
+
+        <Stack.Screen
+          name="Timetable"
+          component={TimetableScreen}
+          options={{ title: 'Timetable' }}
         />
 
         </Stack.Navigator>

@@ -50,7 +50,7 @@ const RoleSelectionScreen = () => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#3cb371" />
         <Text style={styles.loadingText}>Checking auth status...</Text>
       </View>
     );
