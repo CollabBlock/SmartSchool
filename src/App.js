@@ -10,14 +10,15 @@ import AddStudentScreen from './screens/Admin/Students/AddStudentScreen';
 import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
 import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
 import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
+import ViewMarks from './screens/Teacher/Students/ViewMarks.js';
 import ClassDetailScreen from './screens/Admin/Classes/ClassDetailScreen';
-
-
-import TeacherDashboard from './screens/Teacher/TeacherDasboard';
+import TeacherDashboard from './screens/Teacher/TeacherDashboard.js';
 import StudentDashboard from './screens/Student/StudentDashboard';
+import TeacherBottomNavigator from './screens/Teacher/TeacherBottomNavigator';
 import TimetableScreen from './screens/Admin/TimeTable/TimeTableScreen.js';
 import StudentBottomBar from './screens/Student/StudentBottomBar.js';
 import SubjectDetails from './screens/Student/SubjectDetails.js';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -66,11 +67,16 @@ const App = () => {
           component={EditStudentScreen} 
           options={{ title: 'Edit Student' }}
         />
+        <Stack.Screen 
+          name="ViewMarks" 
+          component={ViewMarks} 
+          options={{ title: 'Manage Student Marks' }}
+        />
 
         <Stack.Screen
           name="TeacherDashboard"
-          component={TeacherDashboard}
-          options={{ title: 'Teacher Dashboard' }}
+          component={TeacherBottomNavigator}
+          options={{ title: 'Teacher Dashboard', headerShown: false}}
         />
 
         <Stack.Screen
