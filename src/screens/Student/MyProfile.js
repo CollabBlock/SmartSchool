@@ -45,6 +45,7 @@ const MyProfile = () => {
           <View style={styles.header}>
             <MaterialCommunityIcons name="account-circle" size={80} color={Colors.green30} />
             <Text style={styles.name}>{student.name}</Text>
+            <Text style={styles.email}>Reg Number: {student.id}</Text>
             <Text style={styles.email}>{student.email}</Text>
           </View>
           <Card style={styles.card}>
@@ -73,7 +74,7 @@ const MyProfile = () => {
               <Text style={styles.value}>{student.cast}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.label}>Occupation</Text>
+              <Text style={styles.label}>Father Occupation</Text>
               <Text style={styles.value}>{student.occupation}</Text>
             </View>
             <View style={styles.cardRow}>
@@ -102,15 +103,18 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.green30,
+    color: '#3cb371',
     marginTop: 10,
   },
   email: {
     fontSize: 16,
     color: Colors.grey40,
+    marginTop: 5,
   },
   card: {
     padding: 10,
+    backgroundColor: '#fff',
+    elevation:0,
   },
   cardRow: {
     flexDirection: 'row',
@@ -118,15 +122,18 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: Colors.grey50,
+    marginBottom: 2,
   },
   label: {
     fontSize: 16,
     color: Colors.grey10,
+    paddingLeft: 8,
   },
   value: {
     fontSize: 16,
     fontWeight: 'bold',
     color: Colors.black,
+    marginRight: 8,
   },
 });
 
