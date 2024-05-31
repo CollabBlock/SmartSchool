@@ -8,6 +8,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import auth from '@react-native-firebase/auth';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
+import { green } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -451,8 +452,8 @@ const DashboardScreen = () => {
             absolute 
           />
           <View style={styles.buttonsContainer}>
-            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentInClassReport(), headers: headersForClass})} />
-            <Button label="Download as PDF" onPress={() => downloadPDF(headersForClass, getDataForStudentInClassReport(), "Student in Class - Report")} />
+            <Button style = {styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentInClassReport(), headers: headersForClass})} />
+            <Button style = {styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForClass, getDataForStudentInClassReport(), "Student in Class - Report")} />
           </View>
         </View>
       </Card>
@@ -489,8 +490,8 @@ const DashboardScreen = () => {
             />
           </ScrollView>
           <View style={styles.buttonsContainer}>
-            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentReport(), headers: headersForStudent})} />
-            <Button label="Download as PDF" onPress={() => downloadPDF(headersForStudent, getDataForStudentReport(), "Students Gender & Age Wise Report")} />
+            <Button style = {styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentReport(), headers: headersForStudent})} />
+            <Button style = {styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForStudent, getDataForStudentReport(), "Students Gender & Age Wise Report")} />
           </View>
         </View>
       </Card>
@@ -517,8 +518,8 @@ const DashboardScreen = () => {
             absolute 
           />
           <View style={styles.buttonsContainer}>
-            <Button label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForResultReport(), headers: headersForResult})} />
-            <Button label="Download as PDF" onPress={() => downloadPDF(headersForResult, getDataForResultReport(), "Average Percentage in Each Class Report")} />
+            <Button style = {styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForResultReport(), headers: headersForResult})} />
+            <Button style = {styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForResult, getDataForResultReport(), "Average Percentage in Each Class Report")} />
           </View>
         </View>
       </Card>
@@ -600,6 +601,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    // color: 'green',
+  },
+  Button: {
+    backgroundColor: '#3cb371', // Green color for button
+    borderRadius: 20,
+    padding: 10,
+    margin: 10,
   },
   headerButton: {
     marginRight: 15,
