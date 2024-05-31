@@ -2576,10 +2576,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-picker/picker@^2.7.6":
-  version "2.7.6"
-  resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-2.7.6.tgz"
-  integrity sha512-Cs3PxRmE2vu6TofM9vt9TV8ZYFOtEPSupNxwoorH9lpkKM9HGG8QwK2i29KOEoODpUbtudKHUTtqhMZSuX9pgA==
+"@react-native-picker/picker@npm:^2.7.6":
+  version: 2.7.6
+  resolution: "@react-native-picker/picker@npm:2.7.6"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 8a4ca200a771467107fb82cfc64d7c8dfc6e8bd68768833addce3d1cc1d194126fea7df2f8464ca646a73006f1d5e7b9c138196f1b33e42c2e7231174db523a2
+  languageName: node
+  linkType: hard
 
 "@react-native/assets-registry@npm:0.74.83":
   version: 0.74.83
@@ -3409,6 +3414,7 @@ __metadata:
     "@react-native-firebase/app": ^19.2.2
     "@react-native-firebase/auth": ^19.2.2
     "@react-native-firebase/firestore": ^19.2.2
+    "@react-native-picker/picker": ^2.7.6
     "@react-native/babel-preset": 0.74.83
     "@react-native/eslint-config": 0.74.83
     "@react-native/metro-config": 0.74.83
@@ -3432,6 +3438,7 @@ __metadata:
     react-native-gesture-handler: ^2.16.2
     react-native-html-to-pdf: ^0.12.0
     react-native-image-picker: ^7.1.2
+    react-native-linear-gradient: ^2.8.3
     react-native-modal-datetime-picker: ^17.1.0
     react-native-paper: ^5.12.3
     react-native-reanimated: ^3.11.0
@@ -9140,6 +9147,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: af52328b7cb06c28549442f0d923cfa92dde8d5a968a642336df4c882f81adbf0e5e606a14de27f96883a76fa1e03230061c4080011c9107942edebc8e09c478
+  languageName: node
+  linkType: hard
+
+"react-native-linear-gradient@npm:^2.8.3":
+  version: 2.8.3
+  resolution: "react-native-linear-gradient@npm:2.8.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: f980d324e551bbc475c6406bdc5250a08242020cbe653412fa169bbdf51e28a502e225de105b4d696d6a1a1b733d44782469020f4936d8b3ce0e2c78e51cf58f
   languageName: node
   linkType: hard
 
