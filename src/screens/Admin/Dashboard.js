@@ -448,7 +448,7 @@ const DashboardScreen = () => {
             }}
             accessor="population"
             backgroundColor="transparent"
-            paddingLeft="15"
+            paddingLeft="5"
             absolute 
           />
           <View style={styles.buttonsContainer}>
