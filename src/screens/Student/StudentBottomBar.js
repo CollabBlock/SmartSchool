@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import StudentDashboard from './StudentDashboard';
-import MyClass from './MyClass';
+import MyMarks from './MyMarks';
 import MyFee from './MyFee';
 import MyProfile from './MyProfile';
 
@@ -42,17 +42,17 @@ const StudentBottomBar = () => {
         }}
       />
       <Tab.Screen
-        name="MyClass"
-        component={MyClass}
+        name="My Marks"
+        component={MyMarks}
         options={{
-          tabBarLabel: 'My Class',
+          tabBarLabel: 'Marks',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="school" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen
-        name="Marks"
+        name="MyFee"
         component={MyFee}
         options={{
           tabBarLabel: 'Fee',
@@ -63,7 +63,7 @@ const StudentBottomBar = () => {
       />
 
       <Tab.Screen
-        name="Profile"
+        name="My Profile"
         component={MyProfile}
         options={{
           tabBarLabel: 'Profile',
