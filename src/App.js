@@ -10,10 +10,12 @@ import AddStudentScreen from './screens/Admin/Students/AddStudentScreen';
 import EditStudentScreen from './screens/Admin/Students/EditStudentScreen';
 import AddTeacherScreen from './screens/Admin/Teachers/AddTeacherScreen';
 import FullReportScreen from './screens/Admin/Reports/FullReportScreen.js'
+import ClassDetailScreen from './screens/Admin/Classes/ClassDetailScreen';
 
 
 import TeacherDashboard from './screens/Teacher/TeacherDasboard';
 import StudentDashboard from './screens/Student/StudentDashboard';
+import TimetableScreen from './screens/Admin/TimeTable/TimeTableScreen.js';
 
 
 
@@ -87,6 +89,18 @@ const App = () => {
           name="ViewReport"
           component={FullReportScreen}
           options={{ title: 'Report' }}
+        />
+
+        <Stack.Screen
+          name="ClassDetail"
+          component={ClassDetailScreen}
+          options={{ title: 'Class' }}
+        />
+
+        <Stack.Screen
+          name="Timetable"
+          component={TimetableScreen}
+          options={{ title: 'Timetable' }}
         />
 
         </Stack.Navigator>

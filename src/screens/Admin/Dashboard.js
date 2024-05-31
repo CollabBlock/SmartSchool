@@ -408,9 +408,17 @@ const DashboardScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.welcomeText}>Welcome Back!</Text>
-      <Text style={styles.subText}>Admin, SmartSchool</Text>
-
+      <View style={styles.row}>
+        <View>
+          <Text style={styles.welcomeText}>Welcome Back!</Text>
+          <Text style={styles.subText}>Admin, SmartSchool</Text>
+        </View>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Timetable')}
+        >
+            <MaterialCommunityIcons name="clock" color='#3cb371' size={50} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.row}>
         <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Students screen')}>
           <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
