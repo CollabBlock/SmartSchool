@@ -36,7 +36,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           });
         };
 
-        const iconName = options.tabBarIcon?.({ color: isFocused ? '#3cb371' : '#222', size: 30 });
+        const iconName = options.tabBarIcon?.({ color: isFocused ? '#3cb371' : '#222', size: 25 });
 
         return (
           <View key={index} style={styles.tabBarItem}>
@@ -134,11 +134,11 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#E0FBE2',
     paddingVertical: 10,
     borderTopWidth: 0,
     elevation: 5,
-    paddingTop: 20, // Increased top padding to make it more appealing
+    paddingTop: 10, 
   },
   tabBarItem: {
     alignItems: 'center',
