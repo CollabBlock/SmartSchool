@@ -4983,6 +4983,13 @@ react-is@^16.7.0:
 react-is@^17.0.1:
   version "17.0.2"
 
+react-native-animatable@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npmjs.org/react-native-animatable/-/react-native-animatable-1.4.0.tgz"
+  integrity sha512-DZwaDVWm2NBvBxf7I0wXKXLKb/TxDnkV53sWhCvei1pRyTX3MVFpkvdYBknNBqPrxYuAIlPxEp7gJOidIauUkw==
+  dependencies:
+    prop-types "^15.8.1"
+
 react-native-chart-kit@^6.12.0:
   version "6.12.0"
   resolved "https://registry.npmjs.org/react-native-chart-kit/-/react-native-chart-kit-6.12.0.tgz"
@@ -5026,6 +5033,11 @@ react-native-html-to-pdf@^0.12.0:
   version "0.12.0"
   resolved "https://registry.npmjs.org/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz"
   integrity sha512-Yb5WO9SfF86s5Yv9PqXQ7fZDr9zZOJ+6jtweT9zFLraPNHWX7pSxe2dSkeg3cGiNrib65ZXGN6ksHymfYLFSSg==
+
+react-native-linear-gradient@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.npmjs.org/react-native-linear-gradient/-/react-native-linear-gradient-2.8.3.tgz"
+  integrity sha512-KflAXZcEg54PXkLyflaSZQ3PJp4uC4whM7nT/Uot9m0e/qxFV3p6uor1983D1YOBJbJN7rrWdqIjq0T42jOJyA==
 
 react-native-modal-datetime-picker@^17.1.0:
   version "17.1.0"
