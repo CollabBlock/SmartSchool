@@ -57,7 +57,7 @@ const RoleSelectionScreen = () => {
   }
 
   return (
-    <LinearGradient colors={['pink', '#2193b0']} style={styles.gradient}>
+    <LinearGradient colors={['green', 'white']} style={styles.gradient}>
       <View style={styles.container}>
         <Image source={require('../../assets/images/Sms_Bg.png')} style={styles.logo} />
         <Text style={styles.title}>Choose Your Option</Text>
