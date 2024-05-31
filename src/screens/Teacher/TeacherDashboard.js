@@ -76,17 +76,26 @@ const TeacherDashboard = () => {
 
             // Extract subjects from the first document (assuming all documents have the same structure)
             const firstDocData = marksQuerySnapshot.docs[0].data();
+            if (!firstDocData[term]) {
+                console.error(`Term ${term} does not exist in the marks data.`);
+                setChartData({ labels: [], datasets: [] });
+                return;
+            }
             const subjects = Object.keys(firstDocData[term]);
 
             // Prepare chart data based on subjects
             const chartDatasets = subjects.map(subject => {
                 const subjectMarks = marksQuerySnapshot.docs.map(doc => {
-                    const data = doc.data()[term][subject];
+                    const termData = doc.data()[term];
+                    if (!termData) {
+                        return undefined;
+                    }
+                    const data = termData[subject];
                     if (subject === 'Computer' && Array.isArray(data)) {
                         return data[0] + data[1]; // Sum class and lab marks for Computer
                     }
                     return data;
-                });
+                }).filter(data => data !== undefined); // Filter out undefined values
 
                 let flattenedMarks = [];
                 subjectMarks.forEach(mark => {
@@ -174,8 +183,7 @@ const TeacherDashboard = () => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.welcomeText}>Welcome</Text>
-                <Text style={styles.subText}>{teacherName}</Text>
+                <Text style={styles.welcomeText}>Welcome, <Text style={styles.subText}>{teacherName}</Text></Text>
             </View>
             <View style={styles.row}>
                 <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Total Students')}>
@@ -260,21 +268,16 @@ const styles = StyleSheet.create({
         marginTop: 0,
     },
     header: {
-        alignItems: 'start',
-        flexDirection: 'row',
+       
         marginBottom: 20,
     },
     welcomeText: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#3cb371', // Green color
+        fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
     },
     subText: {
-        fontSize: 20,
-        fontWeight: 'semibold',
-        marginTop: 8, //abhi dekhna hy isko
-        marginLeft: 10,
+        color: '#3cb371',
     },
     row: {
         flexDirection: 'row',

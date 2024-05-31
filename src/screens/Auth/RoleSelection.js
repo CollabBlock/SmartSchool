@@ -59,6 +59,7 @@ const RoleSelectionScreen = () => {
   return (
     <LinearGradient colors={['pink', '#2193b0']} style={styles.gradient}>
       <View style={styles.container}>
+        <Image source={require('../../assets/images/Sms_Bg.png')} style={styles.logo} />
         <Text style={styles.title}>Choose Your Option</Text>
         <View style={styles.iconContainer}>
           <TouchableOpacity
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
@@ -108,12 +109,13 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginBottom: 150,
+    marginTop: 50,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 30,
+    marginBottom: 40,
     color: '#ffffff',
     elevation: 50,
     shadowColor: 'black',

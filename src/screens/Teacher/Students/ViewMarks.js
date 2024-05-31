@@ -227,7 +227,13 @@ const ViewMarks = () => {
                         style={styles.picker}
                         onValueChange={(itemValue) => {
                             setSelectedTerm(itemValue);
-                            fetchMarksData(studentData.class, itemValue);
+                            if (itemValue) {
+                                fetchMarksData(studentData.class, itemValue);
+                            } else {
+                                setMarks({});
+                                setSubjects([]);
+                                setNoMarks(false);
+                            }
                         }}
                     >
                         <Picker.Item label="Select a term" value="" />
