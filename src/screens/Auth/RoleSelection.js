@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -56,54 +57,68 @@ const RoleSelectionScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Choose Your Option</Text>
-      <View style={styles.iconContainer}>
-        <TouchableOpacity
-          style={styles.iconWrapper}
-          onPress={() => handleRoleSelect('admin')}
-        >
-          <View style={[styles.iconBackground, { backgroundColor: '#007bff' }]}>
-            <Icon name="admin-panel-settings" size={50} color="#ffffff" />
-          </View>
-          <Text style={styles.iconLabel}>Admin</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconWrapper}
-          onPress={() => handleRoleSelect('teacher')}
-        >
-          <View style={[styles.iconBackground, { backgroundColor: '#28a745' }]}>
-            <Icon name="school" size={50} color="#ffffff" />
-          </View>
-          <Text style={styles.iconLabel}>Teacher</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity
-        style={styles.iconWrapper}
-        onPress={() => handleRoleSelect('student')}
-      >
-        <View style={[styles.iconBackground, { backgroundColor: '#ffc107' }]}>
-          <Icon name="person" size={50} color="#ffffff" />
+    <LinearGradient colors={['pink', '#2193b0']} style={styles.gradient}>
+      <View style={styles.container}>
+        <Image source={require('C:/Users/Public/OneDrive - Higher Education Commission/SmartSchool/src/assets/images/Sms_Bg.png')} style={styles.logo} />
+        <Text style={styles.title}>Choose Your Option</Text>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity
+            style={styles.iconWrapper}
+            onPress={() => handleRoleSelect('admin')}
+          >
+            <View style={[styles.iconBackground, { backgroundColor: '#007bff' }]}>
+              <Icon name="account-cog" size={50} color="#ffffff" />
+            </View>
+            <Text style={styles.iconLabel}>Admin</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconWrapper}
+            onPress={() => handleRoleSelect('teacher')}
+          >
+            <View style={[styles.iconBackground, { backgroundColor: '#28a745' }]}>
+              <Icon name="school" size={50} color="#ffffff" />
+            </View>
+            <Text style={styles.iconLabel}>Teacher</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconWrapper}
+            onPress={() => handleRoleSelect('student')}
+          >
+            <View style={[styles.iconBackground, { backgroundColor: '#ffc107' }]}>
+              <Icon name="account" size={50} color="#ffffff" />
+            </View>
+            <Text style={styles.iconLabel}>Student</Text>
+          </TouchableOpacity>
         </View>
-        <Text style={styles.iconLabel}>Student</Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#ffffff'
+  },
+  logo: {
+    width: 250,
+    height: 250,
+    resizeMode: 'contain',
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 40,
-    color: '#000000',
+    marginBottom: 30,
+    color: '#ffffff',
+    elevation: 50,
+    shadowColor: 'black',
+    shadowOpacity: 0.5,
   },
   iconContainer: {
     flexDirection: 'row',
@@ -126,7 +141,12 @@ const styles = StyleSheet.create({
   iconLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000000',
+    color: '#ffffff',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#ffffff',
   },
 });
 

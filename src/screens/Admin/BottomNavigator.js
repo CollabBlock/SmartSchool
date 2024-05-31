@@ -5,86 +5,145 @@ import StudentsScreen from './Students/StudentsScreen';
 import TeachersScreen from './Teachers/TeachersScreen';
 import FeeScreen from './Fees/FeeScreen';
 import ClassesScreen from './Classes/ClassesScreen';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { View, Text, StyleSheet } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
-const BottomNavigator = () => {
+const CustomTabBar = ({ state, descriptors, navigation }) => {
   return (
-    <Tab.Navigator initialRouteName='DashboardScreen'
-    screenOptions={{
-      tabBarActiveTintColor: '#3cb371',
-      tabBarInactiveTintColor: '#222',
-      headerTitleAlign: 'center',
-      headerStyle: {
-        backgroundColor: '#3cb371',
-        // borderWidth: 1,
-        // borderBottomColor: '#000000',
-        // color: '#fffff',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-        fontSize: 20,
-      },
-      labelStyle: {
-        fontSize: 14,
-        fontWeight: 'bold',
-      },
-      style: {
-        backgroundColor: '#fff',
-      },
-    }}
-    >
-      <Tab.Screen name="Dashboard" component={DashboardScreen}
+    <View style={styles.tabBarContainer}>
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const isFocused = state.index === index;
 
-      options={{
-        tabBarLabel: 'Dashboard',
-        
-        tabBarIcon: ({ color, size }) => (
-          <MaterialCommunityIcons name="view-dashboard" color={color} size={size} />
-        ),
-      }}
-      
-      />
-      <Tab.Screen name="Manage Students" component={StudentsScreen} 
-        options={{
-          tabBarLabel: 'Students',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-group" color={color} size={size} />
-          ),
-        }}
-      />
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+          });
 
-      <Tab.Screen name="Manage Classes" component={ClassesScreen}
-        options={{
-          tabBarLabel: 'Classes',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="google-classroom" color={color} size={size} />
-          ),
-      }}
-      />
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
 
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
 
-      <Tab.Screen name="Manage Teachers" component={TeachersScreen} 
-        options={{
-          tabBarLabel: 'Teachers',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="school" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen name="Fee" component={FeeScreen}
-        options={{
-          tabBarLabel: 'Fee',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="credit-card" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+        const iconName = options.tabBarIcon?.({ color: isFocused ? '#3cb371' : '#222', size: 30 });
+
+        return (
+          <View key={index} style={styles.tabBarItem}>
+            <Text
+              onPress={onPress}
+              onLongPress={onLongPress}
+              style={{ color: isFocused ? '#3cb371' : '#222', fontSize: 14, fontWeight: 'bold' }}
+            >
+              {iconName}
+            </Text>
+            <Text style={{ color: isFocused ? '#3cb371' : '#222', fontSize: 12 }}>
+              {options.tabBarLabel}
+            </Text>
+          </View>
+        );
+      })}
+    </View>
   );
 };
+
+const BottomNavigator = () => {
+  return (
+    <>
+      <Tab.Navigator
+        initialRouteName='DashboardScreen'
+        tabBar={props => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerTitleAlign: 'center',
+          headerStyle: {
+            backgroundColor: '#3cb371',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 22,
+          },
+        }}
+      >
+        <Tab.Screen
+          name="Dashboard"
+          component={DashboardScreen}
+          options={{
+            tabBarLabel: 'Dashboard',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home-outline" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Manage Students"
+          component={StudentsScreen}
+          options={{
+            tabBarLabel: 'Students',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="people-outline" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Manage Classes"
+          component={ClassesScreen}
+          options={{
+            tabBarLabel: 'Classes',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="school-outline" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Manage Teachers"
+          component={TeachersScreen}
+          options={{
+            tabBarLabel: 'Teachers',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person-outline" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Fee"
+          component={FeeScreen}
+          options={{
+            tabBarLabel: 'Fee',
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome5 name="money-check-alt" color={color} size={size} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </>
+  );
+};
+
+const styles = StyleSheet.create({
+  tabBarContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#f8f8f8',
+    paddingVertical: 10,
+    borderTopWidth: 0,
+    elevation: 5,
+    paddingTop: 20, // Increased top padding to make it more appealing
+  },
+  tabBarItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+});
 
 export default BottomNavigator;
