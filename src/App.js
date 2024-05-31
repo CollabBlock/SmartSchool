@@ -15,9 +15,11 @@ import ViewMarks from './screens/Teacher/Students/ViewMarks.js';
 
 import TeacherDashboard from './screens/Teacher/TeacherDashboard.js';
 import StudentDashboard from './screens/Student/StudentDashboard';
+
 import TeacherBottomNavigator from './screens/Teacher/TeacherBottomNavigator';
 
-
+import StudentBottomBar from './screens/Student/StudentBottomBar.js';
+import SubjectDetails from './screens/Student/SubjectDetails.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -80,9 +82,16 @@ const App = () => {
 
         <Stack.Screen
           name="StudentDashboard"
-          component={StudentDashboard}
-          options={{ title: 'Student Dashboard' }}
+          component={StudentBottomBar}
+          options={{ title: 'Student Dashboard', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="SubjectDetails" 
+          component={SubjectDetails} 
+          options={{ title: 'Subject Details' }}
+         />
+
 
         <Stack.Screen
           name="AddTeacher"
@@ -93,7 +102,7 @@ const App = () => {
         <Stack.Screen
           name="ViewReport"
           component={FullReportScreen}
-          options={{ title: 'View Full Report' }}
+          options={{ title: 'Report' }}
         />
 
         </Stack.Navigator>
