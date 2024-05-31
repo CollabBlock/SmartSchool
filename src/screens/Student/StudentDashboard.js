@@ -1,17 +1,18 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import { Text, Card } from 'react-native-ui-lib';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions } from 'react-native';
+import { Text, Card, Colors } from 'react-native-ui-lib';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
 const StudentDashboard = () => {
   const navigation = useNavigation();
   const [student, setStudent] = useState(null);
-
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchStudentData = async () => {
     try {
@@ -28,31 +29,18 @@ const StudentDashboard = () => {
 
       if (!studentQuerySnapshot.empty) {
         const studentDoc = studentQuerySnapshot.docs[0];
-        setStudent(studentDoc.data());
-        fetchMarks(studentDoc.data().id);
+        const studentData = studentDoc.data();
+        setStudent(studentData);
+        setSubjects(getSubjectsByClass(studentData.class));
       } else {
-        Alert.alert("Error", "Student data not found.");
+        console.error("Student data not found.");
       }
     } catch (error) {
       console.error("Error fetching student data:", error);
-      Alert.alert("Error", "Failed to fetch student data.");
+    } finally {
+      setLoading(false);
     }
   };
-
-  const fetchMarks = async (studentId) => {
-    try {
-      const marksSnapshot = await firestore()
-        .collection('marks')
-        .where('regNo', '==', studentId.toString())
-        .get();
-
-     
-    } catch (error) {
-      console.error("Error fetching marks:", error);
-    }
-  };
-
-  
 
   useFocusEffect(
     useCallback(() => {
@@ -60,79 +48,88 @@ const StudentDashboard = () => {
     }, [])
   );
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
-          <MaterialCommunityIcons name="logout" size={24} color="#fff" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
-  const handleLogout = () => {
-    auth()
-      .signOut()
-      .then(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'RoleSelection' }],
-        });
-      })
-      .catch(error => {
-        console.error('Error during sign out:', error);
-        Alert.alert('Error', 'Failed to log out.');
-      });
+  const getSubjectsByClass = (className) => {
+    const subjectsByClass = {
+      Nursery: ['English', 'Urdu', 'Math', 'Nazra-e-Quran'],
+      Prep: ['English', 'Urdu', 'Math', 'Nazra-e-Quran', 'General Knowledge'],
+      1: ['English', 'Urdu', 'Math', 'General Knowledge', 'Islamyat'],
+      2: ['English', 'Urdu', 'Math', 'General Knowledge', 'Islamyat', 'Computer'],
+      3: ['English', 'Urdu', 'Math', 'General Knowledge', 'Islamyat', 'Computer'],
+      4: ['English', 'Urdu', 'Math', 'General Knowledge', 'Social Study', 'Islamyat', 'Computer'],
+      5: ['English', 'Urdu', 'Math', 'General Knowledge', 'Social Study', 'Islamyat', 'Computer'],
+      6: ['English', 'Urdu', 'Math', 'General Knowledge', 'Social Study', 'Islamyat', 'Computer', 'Quran'],
+      7: ['English', 'Urdu', 'Math', 'General Knowledge', 'Social Study', 'Islamyat', 'Computer', 'Quran'],
+      8: ['English', 'Urdu', 'Math', 'General Knowledge', 'Social Study', 'Islamyat', 'Computer', 'Quran'],
+    };
+    return subjectsByClass[className] || [];
   };
 
+  const renderSubjects = ({ item }) => (
+    <Card style={styles.subjectCard}>
+      <View style={styles.subjectCardContent}>
+        <Text style={styles.subjectText}>{item}</Text>
+        <TouchableOpacity style={styles.subjectButton}>
+          <Text style={styles.subjectButtonText}>View Syllabus</Text>
+        </TouchableOpacity>
+      </View>
+    </Card>
+  );
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {student ? (
+    <View style={styles.container}>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3cb371" />
+          <Text>Loading...</Text>
+        </View>
+      ) : (
         <>
           <View style={styles.header}>
-            <Text style={styles.welcomeText}>Welcome, {student.name}</Text>
-            <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
-              <MaterialCommunityIcons name="logout" size={24} color="#fff" />
-            </TouchableOpacity>
+            <Text style={styles.headerText}>Welcome, <Text style={styles.headerName}>{student?.name}</Text></Text>
+            <Text style={styles.classText}>Class: {student?.class}</Text>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Class Information</Text>
-            <Card style={styles.card}>
-              <Card.Section content={[{ text: `Class: ${student.class}`, text70: true, grey10: true }]} contentStyle={styles.cardContent} />
-            </Card>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Overview</Text>
-            <View style={styles.row}>
-            </View>
+            <Text style={styles.sectionTitle}>Subjects</Text>
+            <FlatList
+              data={subjects}
+              renderItem={renderSubjects}
+              keyExtractor={(item, index) => index.toString()}
+              style={styles.flatList}
+            />
           </View>
         </>
-      ) : (
-        <Text>Loading...</Text>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#ffffff' // Mint cream
+    backgroundColor: '#fff',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  welcomeText: {
+  header: {
+    marginBottom: 20,
+  },
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#000',
+  },
+  headerName: {
+    color: '#3cb371',
+  },
+  classText: {
+    fontSize: 18,
+    color: '#000',
     marginBottom: 20,
-    color: '#3cb371', // Green color for text
   },
   section: {
     marginBottom: 20,
@@ -142,30 +139,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  card: {
-    width: (screenWidth / 2) - 25, // Adjust width to fit two cards per row
-    backgroundColor: '#F2F2F2', // White background for cards
+  subjectCard: {
+    width: screenWidth - 40,
+    backgroundColor: '#F2F2F2',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#3cb371', // Green border
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-    margin: 5,
-  },
-  cardContent: {
-    alignItems: 'center',
+    borderColor: Colors.grey50,
     padding: 10,
+    marginVertical: 5,
   },
-  headerButton: {
-    marginRight: 15,
+  subjectCardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  subjectText: {
+    fontSize: 18,
+    color: '#000',
+  },
+  subjectButton: {
+    backgroundColor: '#3cb371',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  subjectButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
