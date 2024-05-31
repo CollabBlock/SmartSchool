@@ -121,7 +121,7 @@ const BottomNavigator = () => {
           options={{
             tabBarLabel: 'Fee',
             tabBarIcon: ({ color, size }) => (
-              <FontAwesome5 name="money-check-alt" color={color} size={size} />
+              <Ionicons name="cash-outline" color={color} size={size} />
             ),
           }}
         />

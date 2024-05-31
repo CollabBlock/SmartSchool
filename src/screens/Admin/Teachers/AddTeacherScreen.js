@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { TextField, Text, Button, Picker } from 'react-native-ui-lib';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const AddTeacherScreen = () => {
@@ -9,6 +10,8 @@ const AddTeacherScreen = () => {
   const [email, setEmail] = useState('');
   const [teacherClass, setTeacherClass] = useState('None');
   const [classes, setClasses] = useState([]);
+  const [teacherID, setTeacherID] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -21,7 +24,39 @@ const AddTeacherScreen = () => {
       }
     };
 
+    const fetchTeacherCount = async () => {
+      try {
+        const teachersSnapshot = await firestore().collection('teachers').get();
+        const teachersList = teachersSnapshot.docs.map(doc => ({
+          label: `${doc.data().name} (${doc.data().id})`,
+          value: doc.data().id,
+        }));
+
+        const customSort = (a, b) => {
+          const numA = parseInt(a.value, 10);
+          const numB = parseInt(b.value, 10);
+
+          if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+          }
+
+          return a.value.localeCompare(b.value, undefined, { numeric: true, sensitivity: 'base' });
+        };
+
+        teachersList.sort(customSort);
+        
+        const highestID = teachersList.length > 0 ? parseInt(teachersList[teachersList.length - 1].value, 10) : 0;
+        const newId = (highestID + 1).toString();
+
+        setTeacherID(newId);
+        setEmail(`teacher_${newId}@smart.com`);
+      } catch (error) {
+        console.error('Error fetching teacher count:', error);
+      }
+    };
+
     fetchClasses();
+    fetchTeacherCount();
   }, []);
 
   const handleAddTeacher = async () => {
@@ -30,22 +65,44 @@ const AddTeacherScreen = () => {
       return;
     }
 
+    setLoading(true);
     try {
+      // Add teacher to the 'teachers' collection
       await firestore()
         .collection('teachers')
-        .add({
+        .doc(teacherID)
+        .set({
+          id: parseInt(teacherID, 10),
           name,
           email,
           class: teacherClass === 'None' ? '' : teacherClass,
         });
-      Alert.alert('Success', 'Teacher added successfully!');
+
+        console.log('teacherID:', teacherID, 'name:', name, 'email:', email, 'class:', teacherClass)
+
+      // Add teacher to the 'Users' collection
+      await firestore()
+        .collection('Users')
+        .doc(`teacher_${teacherID}`)
+        .set({
+          email,
+          role: 'teacher',
+        });
+
+      // Create authentication for the user
+      await auth().createUserWithEmailAndPassword(email, `teacher_${teacherID}`);
+
+      Alert.alert('Success', `Teacher added successfully! with email: ${email}`);
       setName('');
-      setEmail('');
+      const newTeacherID = (parseInt(teacherID, 10) + 1).toString();
+      setTeacherID(newTeacherID);
+      setEmail(`teacher_${newTeacherID}@smart.com`);
       setTeacherClass('None');
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
       console.error('Error adding teacher:', error);
     }
+    setLoading(false);
   };
 
   return (
@@ -102,7 +159,6 @@ const AddTeacherScreen = () => {
           onChange={item => setTeacherClass(item.valueOf())}
           useNativePicker
           style={styles.picker}
-          
         >
           {classes.map(classItem => (
             <Picker.Item key={classItem} value={classItem} label={classItem} />
@@ -112,13 +168,14 @@ const AddTeacherScreen = () => {
           name="chevron-down"
           size={20}
           color="#3cb371"
-          style={{ position: 'absolute', right: 10, top: 10 }}
+          style={{ position: 'absolute', right: 10, top: 25 }}
         />
       </View>
       <Button
-        label="Add Teacher"
+        label={loading ? <ActivityIndicator color="#fff" /> : "Add Teacher"}
         onPress={handleAddTeacher}
         style={styles.addButton}
+        disabled={loading}
       />
     </ScrollView>
   );
@@ -145,7 +202,6 @@ const styles = StyleSheet.create({
   },
   warningText: {
     marginLeft: 10,
-    // dark gray color
     color: '#333',
   },
   inputContainer: {

@@ -113,14 +113,14 @@ const MyMarks = () => {
     const part1Marks = marks[term.toLowerCase()]?.Computer?.[0] || 'N/A';
     const part2Marks = marks[term.toLowerCase()]?.Computer?.[1] || 'N/A';
     const [totalPart1, totalPart2] = getTotalMarks('Computer', term.toLowerCase());
-  
+
     return (
       <>
-        <View style={styles.termContainer}>
+        <View style={styles.termContainer} key={`${term}-part1`}>
           <Text style={styles.termText}>{term} Term - Part 1:</Text>
           <Text style={styles.marksText}>{part1Marks}/{totalPart1}</Text>
         </View>
-        <View style={styles.termContainer}>
+        <View style={styles.termContainer} key={`${term}-part2`}>
           <Text style={styles.termText}>{term} Term - Part 2:</Text>
           <Text style={styles.marksText}>{part2Marks}/{totalPart2}</Text>
         </View>
@@ -130,7 +130,7 @@ const MyMarks = () => {
 
   const renderSubjectItem = ({ item }) => {
     return (
-      <Card style={styles.card}>
+      <Card style={styles.card} key={item}>
         <Card.Section
           content={[
             { text: item, text70: true, grey10: true, style: styles.subjectTitle },
@@ -139,9 +139,13 @@ const MyMarks = () => {
         />
         <View style={styles.marksContainer}>
           {item === 'Computer' ? 
-            (['First', 'Mid', 'Final'].map(term => renderComputerMarks(term))) : 
             (['First', 'Mid', 'Final'].map(term => (
-              <View style={styles.termContainer}>
+              <React.Fragment key={`${item}-${term}`}>
+                {renderComputerMarks(term)}
+              </React.Fragment>
+            ))) : 
+            (['First', 'Mid', 'Final'].map(term => (
+              <View style={styles.termContainer} key={`${item}-${term}`}>
                 <Text style={styles.termText}>{term} Term:</Text>
                 <Text style={styles.marksText}>{marks[term.toLowerCase()]?.[item] || 'N/A'}/{getTotalMarks(item, term.toLowerCase())}</Text>
               </View>
