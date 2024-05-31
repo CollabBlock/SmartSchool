@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
 import { TextField, Colors, Typography, Text } from 'react-native-ui-lib';
 
@@ -6,6 +6,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import firestore from '@react-native-firebase/firestore';
 
+import auth from '@react-native-firebase/auth';
 
 
 const AddStudentScreen = () => {
@@ -23,8 +24,44 @@ const AddStudentScreen = () => {
   // const [password, setPassword] = useState('');
   const [remarks, setRemarks] = useState('');
 
-
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [currentDateField, setCurrentDateField] = useState('');
+
+
+  useEffect(() => {
+    const fetchStudentCount = async () => {
+      try {
+        const studentsSnapshot = await firestore().collection('students').get();
+        const studentsList = studentsSnapshot.docs.map(doc => ({
+          label: `${doc.data().name} (${doc.id})`,
+          value: doc.id
+        }));
+
+        const customSort = (a, b) => {
+          const numA = parseInt(a.value, 10);
+          const numB = parseInt(b.value, 10);
+
+          if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+          }
+
+          return a.value.localeCompare(b.value, undefined, { numeric: true, sensitivity: 'base' });
+        };
+
+        studentsList.sort(customSort);
+        
+        const highestID = studentsList.length > 0 ? parseInt(studentsList[studentsList.length - 1].value, 10) : 0;
+        const newId = highestID + 1;
+        setID(newId.toString());
+        setEmail(`student_${newId}@smart.com`);
+      } catch (error) {
+        console.error('Error fetching student count:', error);
+      }
+    };
+
+    fetchStudentCount();
+  }, []);
+
 
 
   const handleAddStudent = async () => {
@@ -40,13 +77,13 @@ const AddStudentScreen = () => {
       !residence ||
       !admclass ||
       !email
-      // !password
     ) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
 
     try {
+      // Add student to the 'students' collection
       await firestore().collection('students').doc(id.toString()).set({
         id: parseInt(id, 10),
         admissionDate,
@@ -57,32 +94,57 @@ const AddStudentScreen = () => {
         cast,
         occupation,
         residence,
-        admclass,
+        class: admclass,
         email,
-        // password,
         remarks,
       });
-      Alert.alert('Success', 'Student added successfully!');
+
+      // Add student to the 'Users' collection
+      await firestore().collection('Users').doc(`student_${id}`).set({
+        email,
+        role: 'student',
+      });
+
+      // Create authentication for the user
+      await auth().createUserWithEmailAndPassword(email, `student_${id}`);
+
+      Alert.alert('Success', `Student added successfully! with email: ${email}`);
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
       console.error('Error adding student:', error);
     }
   };
 
-
-  const showDatePicker = () => {
+  const showDatePicker = (field) => {
+    setCurrentDateField(field);
     setDatePickerVisibility(true);
   };
+  
 
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
 
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+  
+    return `${day}-${month}-${year}`;
+  };
+  
+
   const handleConfirm = (date) => {
-    setDateOfAdmission(date.toISOString().split('T')[0]);
+    const formattedDate = formatDate(date);
+    if (currentDateField === 'admissionDate') {
+      setAdmissionDate(formattedDate);
+    } else if (currentDateField === 'dob') {
+      setdob(formattedDate);
+    }
     hideDatePicker();
   };
 
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* <Text style={styles.title}>Add New Student</Text> */}
@@ -113,16 +175,14 @@ const AddStudentScreen = () => {
           floatingPlaceholder
           floatOnFocus
           floatingPlaceholderColor={{ focus: '#3cb371', error: '#E63B2E' }}
-
           enableErrors
-
-          validate={['required', 'date']}
+          validate={['required']}
           validateOnChange
           validationMessage={['Field is required']}
           validationMessagePosition="bottom"
           fieldStyle={styles.fieldStyle}
           trailingAccessory={
-            <TouchableOpacity onPress={showDatePicker}>
+            <TouchableOpacity onPress={() => showDatePicker('admissionDate')}>
               <MaterialCommunityIcons name="calendar" size={24} color="#3cb371" />
             </TouchableOpacity>
           }
@@ -154,23 +214,35 @@ const AddStudentScreen = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <TextField
-          value={dob}
-          onChangeText={setdob}
-          placeholder="Date of Birth"
-          floatingPlaceholder
-          floatOnFocus
-          floatingPlaceholderColor={{ focus: '#3cb371', error: '#E63B2E' }}
-          fieldStyle={styles.fieldStyle}
+      <TextField
+        value={dob}
+        onChangeText={setdob}
+        placeholder="Date of Birth"
+        floatingPlaceholder
+        floatOnFocus
+        floatingPlaceholderColor={{ focus: '#3cb371', error: '#E63B2E' }}
+        enableErrors
+        validate={['required']}
+        validateOnChange
+        validationMessage={['Field is required']}
+        validationMessagePosition="bottom"
+        fieldStyle={styles.fieldStyle}
+        trailingAccessory={
+          <TouchableOpacity onPress={() => showDatePicker('dob')}>
+            <MaterialCommunityIcons name="calendar" size={24} color="#3cb371" />
+          </TouchableOpacity>
+        }
 
-          enableErrors
-          validate={['required']}
-          validateOnChange
-          validationMessage={['Field is required']}
-          validationMessagePosition="bottom"
-          underlineColor={{ focus: '#3cb371', error: '#E63B2E' }}
-        />
-      </View>
+        
+      />
+      {/* <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      /> */}
+
+    </View>
       <View style={styles.inputContainer}>
         <TextField
           value={gender}
@@ -279,7 +351,7 @@ const AddStudentScreen = () => {
           underlineColor={{ focus: '#3cb371', error: '#E63B2E' }}
         />
       </View>
-      <View style={styles.inputContainer}>
+      {/* <View style={styles.inputContainer}>
         <TextField
           value={email}
           onChangeText={setEmail}
@@ -297,7 +369,7 @@ const AddStudentScreen = () => {
           validationMessagePosition="bottom"
           underlineColor={{ focus: '#3cb371', error: '#E63B2E' }}
         />
-      </View>
+      </View> */}
       {/* <View style={styles.inputContainer}>
         <TextField
           value={password}
