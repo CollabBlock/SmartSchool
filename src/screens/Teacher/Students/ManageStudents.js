@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import { Text, ListItem, Colors, TextField } from 'react-native-ui-lib';
-
+import { Text, Colors, TextField } from 'react-native-ui-lib';
 
 const ManageStudents = () => {
     const navigation = useNavigation();
     const [students, setStudents] = useState([]);
     const [search, setSearch] = useState('');
     const [filteredStudents, setFilteredStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,24 +20,24 @@ const ManageStudents = () => {
                 console.error("No authenticated user");
                 return;
             }
-    
+
             const userEmail = user.email;
             console.log("Authenticated user email:", userEmail);
-    
+
             try {
                 const teacherQuerySnapshot = await firestore()
                     .collection('teachers')
                     .where('email', '==', userEmail)
                     .get();
-    
+
                 if (teacherQuerySnapshot.empty) {
                     console.error("No such document in teachers collection for user email:", userEmail);
                     return;
                 }
-    
+
                 const teacherDoc = teacherQuerySnapshot.docs[0];
                 const teacherData = teacherDoc.data();
-    
+
                 const unsubscribe = firestore()
                     .collection('students')
                     .where('class', '==', teacherData.class)
@@ -51,17 +51,17 @@ const ManageStudents = () => {
                         });
                         setStudents(studentsData);
                         setFilteredStudents(studentsData); // Initialize filteredStudents with all students
+                        setLoading(false); // Stop loading
                     });
-    
+
                 return unsubscribe;
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
-    
+
         fetchData();
     }, []);
-    
 
     useEffect(() => {
         const results = students.filter(student =>
@@ -87,27 +87,31 @@ const ManageStudents = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.searchBar} >
-                <TextField
-                    placeholder="🔎 Search by name or registration number"
-                    value={search}
-                    onChangeText={setSearch}
-                    floatingPlaceholder
-                    floatOnFocus
-                    containerStyle={styles.searchText}
-                    floatingPlaceholderColor={{ focus: Colors.green30 }}
-                // centered
-                // fieldStyle={{ color: Colors.grey60, borderColor: Colors.grey60}}
-                />
-                {/* // lets a cross icon to clear the search field */}
-                <MaterialCommunityIcons name="close" size={20} color={Colors.grey20} onPress={() => setSearch('')} style={styles.clearSearch} />
-
-            </View>
-            <FlatList
-                data={filteredStudents}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.key}
-            />
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#3cb371" />
+                </View>
+            ) : (
+                <>
+                    <View style={styles.searchBar} >
+                        <TextField
+                            placeholder="🔎 Search by name or registration number"
+                            value={search}
+                            onChangeText={setSearch}
+                            floatingPlaceholder
+                            floatOnFocus
+                            containerStyle={styles.searchText}
+                            floatingPlaceholderColor={{ focus: Colors.green30 }}
+                        />
+                        <MaterialCommunityIcons name="close" size={20} color={Colors.grey20} onPress={() => setSearch('')} style={styles.clearSearch} />
+                    </View>
+                    <FlatList
+                        data={filteredStudents}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.key}
+                    />
+                </>
+            )}
         </View>
     );
 };
@@ -121,33 +125,23 @@ const styles = StyleSheet.create({
     searchBar: {
         flexDirection: 'row',
         marginBottom: 15,
-        // borderRadius: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        // borderWidth: 1,
-        // paddingHorizontal: 35,
         borderColor: Colors.grey50,
     },
-
     clearSearch: {
         position: 'absolute',
         right: 15,
         top: 20,
     },
-
     searchText: {
         flex: 1,
-        // backgroundColor: 'red',
-        // borderWidth: 1,
-        // borderColor: Colors.grey50,
         paddingLeft: 10,
         marginLeft: 7,
-
     },
     profilePic: {
         marginRight: 10,
     },
-
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -173,19 +167,8 @@ const styles = StyleSheet.create({
         color: Colors.grey40,
         marginTop: 3,
     },
-    deleteButton: {
-        marginLeft: 10,
-        padding: 8,
-        backgroundColor: 'transparent',
-    },
-    addButton: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#3cb371',
+    loadingContainer: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
