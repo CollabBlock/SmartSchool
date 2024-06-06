@@ -171,7 +171,7 @@ const MyMarks = () => {
       {loading ? (
         <View style={styles.containerActivity}>
           <ActivityIndicator size="large" color="#3cb371" />
-          <Text style={styles.loadingText}>Loading Your Class...</Text>
+          <Text>Loading...</Text>
         </View>
       ) : (
         <>

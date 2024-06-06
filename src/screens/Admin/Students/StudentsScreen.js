@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import firestore from '@react-native-firebase/firestore';
-import { Text, ListItem, Colors, TextField } from 'react-native-ui-lib';
-
+import { Text, Colors, TextField } from 'react-native-ui-lib';
 
 const StudentsScreen = () => {
   const navigation = useNavigation();
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState('');
   const [filteredStudents, setFilteredStudents] = useState([]);
+  const [loading, setLoading] = useState(true); // New state for loading
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -25,6 +25,7 @@ const StudentsScreen = () => {
         });
         setStudents(studentsData);
         setFilteredStudents(studentsData); // Initialize filteredStudents with all students
+        setLoading(false); // Set loading to false when data is fetched
       });
 
     return () => unsubscribe();
@@ -40,9 +41,7 @@ const StudentsScreen = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.listItem}>
-      {/* // lets add profile image here */}
-      <MaterialCommunityIcons name="account-circle" size={40} color={'#3cb371'} style={styles.profilePic}/>
-
+      <MaterialCommunityIcons name="account-circle" size={40} color={'#3cb371'} style={styles.profilePic} />
       <TouchableOpacity
         onPress={() => navigation.navigate('EditStudent', { studentId: item.key })}
         style={styles.listItemContent}
@@ -62,32 +61,32 @@ const StudentsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View  style={styles.searchBar} >
-      <TextField
-        placeholder="🔎 Search by name or registration number"
-        value={search}
-        onChangeText={setSearch}
-        floatingPlaceholder
-        floatOnFocus
-        containerStyle={styles.searchText}
-        floatingPlaceholderColor={{ focus: Colors.green30 }}
-        // centered
-        // fieldStyle={{ color: Colors.grey60, borderColor: Colors.grey60}}
-      />
-      {/* // lets a cross icon to clear the search field */}
-      <MaterialCommunityIcons name="close" size={20} color={Colors.grey20} onPress={() => setSearch('')} style={styles.clearSearch}/>
-
+      <View style={styles.searchBar}>
+        <TextField
+          placeholder="🔎 Search by name or registration number"
+          value={search}
+          onChangeText={setSearch}
+          floatingPlaceholder
+          floatOnFocus
+          containerStyle={styles.searchText}
+          floatingPlaceholderColor={{ focus: Colors.green30 }}
+        />
+        <MaterialCommunityIcons name="close" size={20} color={Colors.grey20} onPress={() => setSearch('')} style={styles.clearSearch} />
       </View>
-      <FlatList
-        data={filteredStudents}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.key}
-      />
+      {loading ? ( // Show ActivityIndicator when loading
+        <ActivityIndicator size="large" color="#3cb371" style={styles.loadingIndicator} />
+      ) : (
+        <FlatList
+          data={filteredStudents}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+        />
+      )}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddStudent')}
       >
-        <MaterialCommunityIcons name="plus" size={30} color="#fff"  />
+        <MaterialCommunityIcons name="plus" size={30} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -103,33 +102,23 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     marginBottom: 15,
-    // borderRadius: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    // borderWidth: 1,
-    // paddingHorizontal: 35,
     borderColor: Colors.grey50,
   },
-
   clearSearch: {
     position: 'absolute',
     right: 15,
     top: 20,
   },
-
   searchText: {
     flex: 1,
-    // backgroundColor: 'red',
-    // borderWidth: 1,
-    // borderColor: Colors.grey50,
     paddingLeft: 10,
     marginLeft: 7,
-
   },
   profilePic: {
     marginRight: 10,
   },
-
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -168,6 +157,11 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: '#3cb371',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingIndicator: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

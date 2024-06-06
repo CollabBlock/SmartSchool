@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text, Card } from 'react-native-ui-lib';
 import firestore from '@react-native-firebase/firestore';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -19,9 +19,11 @@ const TeacherDashboard = () => {
     const [selectedTerm, setSelectedTerm] = useState('first');
     const [selectedDataType, setSelectedDataType] = useState('average');
     const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+    const [loading, setLoading] = useState(true);
 
     const fetchTeacherData = async () => {
         try {
+            setLoading(true); // Start loading
             const user = auth().currentUser;
             if (!user) {
                 console.error("No authenticated user");
@@ -55,6 +57,8 @@ const TeacherDashboard = () => {
             fetchMarksData(teacherData.class, 'first', 'average'); // Initial load for 'first' term and 'average' data type
         } catch (error) {
             console.error("Error fetching teacher data: ", error);
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
@@ -137,6 +141,8 @@ const TeacherDashboard = () => {
             });
         } catch (error) {
             console.error("Error fetching marks data: ", error);
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
@@ -182,80 +188,88 @@ const TeacherDashboard = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.welcomeText}>Welcome, <Text style={styles.subText}>{teacherName}</Text></Text>
-            </View>
-            <View style={styles.row}>
-                <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Total Students')}>
-                    <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
-                </Card>
-                <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Tasks screen')}>
-                    <Card.Section content={[{ text: 'Class', text70: true, grey10: true }, { text: `${teacherClass}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
-                </Card>
-            </View>
-            <View style={styles.dropdownContainer}>
-                <View style={styles.dropdownRow}>
-                    <Text style={styles.dropdownLabel}>Select Term:</Text>
-                    <Picker
-                        selectedValue={selectedTerm}
-                        style={styles.picker}
-                        onValueChange={handleTermChange}
-                    >
-                        <Picker.Item label="First Term" value="first" />
-                        <Picker.Item label="Mid Term" value="mid" />
-                        <Picker.Item label="Final Term" value="final" />
-                    </Picker>
+            {loading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#3cb371" />
                 </View>
-                <View style={styles.dropdownRow}>
-                    <Text style={styles.dropdownLabel}>Select Data Type:</Text>
-                    <Picker
-                        selectedValue={selectedDataType}
-                        style={styles.picker}
-                        onValueChange={handleDataTypeChange}
-                    >
-                        <Picker.Item label="Average" value="average" />
-                        <Picker.Item label="Highest" value="highest" />
-                        <Picker.Item label="Lowest" value="lowest" />
-                    </Picker>
-                </View>
-            </View>
-            <View style={styles.chartContainer}>
-                <Text style={styles.chartTitle}>{`${selectedTerm.charAt(0).toUpperCase() + selectedTerm.slice(1)} Term Marks (${selectedDataType.charAt(0).toUpperCase() + selectedDataType.slice(1)})`}</Text>
-                {chartData.labels.length > 0 ? (
-                    <ScrollView horizontal={true}>
-                        <BarChart
-                            data={{
-                                labels: chartData.labels,
-                                datasets: chartData.datasets.map(dataset => ({
-                                    ...dataset,
-                                    data: dataset.data.map(value => (isNaN(value) ? 0 : value)), // Ensure data values are numeric
-                                })),
-                            }}
-                            width={Math.max(350, chartData.labels.length * 100)} // Minimum width of 1150, or adjust dynamically based on the number of labels
-                            height={230}
-                            chartConfig={{
-                                backgroundColor: '#3cb371',
-                                backgroundGradientFrom: '#66cdaa',
-                                backgroundGradientTo: '#3cb371',
-                                decimalPlaces: 0,
-                                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                                style: {
-                                    borderRadius: 16,
-                                },
-                                propsForDots: {
-                                    r: "6",
-                                    strokeWidth: "2",
-                                    stroke: '#000000'
-                                },
-                            }}
-                            style={styles.chart}
-                        />
-                    </ScrollView>
-                ) : (
-                    <Text>No data available for the selected term and data type.</Text>
-                )}
-            </View>
+            ) : (
+                <>
+                    <View style={styles.header}>
+                        <Text style={styles.welcomeText}>Welcome, <Text style={styles.subText}>{teacherName}</Text></Text>
+                    </View>
+                    <View style={styles.row}>
+                        <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Total Students')}>
+                            <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
+                        </Card>
+                        <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Tasks screen')}>
+                            <Card.Section content={[{ text: 'Class', text70: true, grey10: true }, { text: `${teacherClass}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
+                        </Card>
+                    </View>
+                    <View style={styles.dropdownContainer}>
+                        <View style={styles.dropdownRow}>
+                            <Text style={styles.dropdownLabel}>Select Term:</Text>
+                            <Picker
+                                selectedValue={selectedTerm}
+                                style={styles.picker}
+                                onValueChange={handleTermChange}
+                            >
+                                <Picker.Item label="First Term" value="first" />
+                                <Picker.Item label="Mid Term" value="mid" />
+                                <Picker.Item label="Final Term" value="final" />
+                            </Picker>
+                        </View>
+                        <View style={styles.dropdownRow}>
+                            <Text style={styles.dropdownLabel}>Select Data Type:</Text>
+                            <Picker
+                                selectedValue={selectedDataType}
+                                style={styles.picker}
+                                onValueChange={handleDataTypeChange}
+                            >
+                                <Picker.Item label="Average" value="average" />
+                                <Picker.Item label="Highest" value="highest" />
+                                <Picker.Item label="Lowest" value="lowest" />
+                            </Picker>
+                        </View>
+                    </View>
+                    <View style={styles.chartContainer}>
+                        <Text style={styles.chartTitle}>{`${selectedTerm.charAt(0).toUpperCase() + selectedTerm.slice(1)} Term Marks (${selectedDataType.charAt(0).toUpperCase() + selectedDataType.slice(1)})`}</Text>
+                        {chartData.labels.length > 0 ? (
+                            <ScrollView horizontal={true}>
+                                <BarChart
+                                    data={{
+                                        labels: chartData.labels,
+                                        datasets: chartData.datasets.map(dataset => ({
+                                            ...dataset,
+                                            data: dataset.data.map(value => (isNaN(value) ? 0 : value)), // Ensure data values are numeric
+                                        })),
+                                    }}
+                                    width={Math.max(350, chartData.labels.length * 100)} // Minimum width of 1150, or adjust dynamically based on the number of labels
+                                    height={230}
+                                    chartConfig={{
+                                        backgroundColor: '#3cb371',
+                                        backgroundGradientFrom: '#66cdaa',
+                                        backgroundGradientTo: '#3cb371',
+                                        decimalPlaces: 0,
+                                        color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                        style: {
+                                            borderRadius: 16,
+                                        },
+                                        propsForDots: {
+                                            r: "6",
+                                            strokeWidth: "2",
+                                            stroke: '#000000'
+                                        },
+                                    }}
+                                    style={styles.chart}
+                                />
+                            </ScrollView>
+                        ) : (
+                            <Text>No data available for the selected term and data type.</Text>
+                        )}
+                    </View>
+                </>
+            )}
         </ScrollView>
     );
 };
@@ -263,12 +277,10 @@ const TeacherDashboard = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        // justifyContent: 'center',
         padding: 20,
         marginTop: 0,
     },
     header: {
-       
         marginBottom: 20,
     },
     welcomeText: {
@@ -306,7 +318,6 @@ const styles = StyleSheet.create({
     headerButton: {
         marginRight: 15,
     },
-
     dropdownContainer: {
         marginVertical: 15,
         marginBottom: 20,
@@ -317,14 +328,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 10,
     },
-
     dropdownLabel: {
         fontSize: 16,
         color: '#333',
-    },
-    dropdown: {
-        marginVertical: 15,
-        alignItems: 'center',
     },
     picker: {
         height: 50,
@@ -333,7 +339,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderColor: '#ccc',
         borderWidth: 1,
-
     },
     chartContainer: {
         alignItems: 'center',
@@ -345,6 +350,11 @@ const styles = StyleSheet.create({
     },
     chart: {
         borderRadius: 16,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

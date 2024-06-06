@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Colors, View, ScrollView, StyleSheet, Dimensions, TouchableOpacity, PermissionsAndroid, Platform, Alert} from 'react-native';
+import { Colors, View, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Text, Card, Button } from 'react-native-ui-lib';
 import { PieChart, StackedBarChart } from 'react-native-chart-kit';
 import firestore from '@react-native-firebase/firestore';
@@ -8,7 +8,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import auth from '@react-native-firebase/auth';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import Share from 'react-native-share';
-import { green } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -21,6 +20,7 @@ const DashboardScreen = () => {
   const [studentsPerClass, setStudentsPerClass] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [marks, setMarks] = useState([]);
   const [averagePercentagePerClass, setAveragePercentagePerClass] = useState([95, 90, 87, 89, 95, 92, 88, 85, 90, 92]);
+  const [loading, setLoading] = useState(true);
 
   const fetchStudent = async () => {
     try {
@@ -30,7 +30,7 @@ const DashboardScreen = () => {
       setStudentCount(studentsSnapshot.size);
       const classCounts = studentsData.reduce((acc, student) => {
         let classID = student.class;
-        classID = (classID == 'Nursery')?0:((classID == 'Prep')?1:parseInt(classID) + 1);
+        classID = (classID == 'Nursery') ? 0 : ((classID == 'Prep') ? 1 : parseInt(classID) + 1);
         acc[classID] = (acc[classID] || 0) + 1;
         return acc;
       }, []);
@@ -78,9 +78,8 @@ const DashboardScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchStudent();
-      fetchTeacherCount();
-      fetchMarks();
+      setLoading(true); // Start loading
+      Promise.all([fetchStudent(), fetchTeacherCount(), fetchMarks()]).finally(() => setLoading(false)); // Stop loading after fetching data
     }, [])
   );
 
@@ -143,24 +142,24 @@ const DashboardScreen = () => {
     var ageMonths = currentMonth - dobMonth;
 
     if (ageMonths < 0) {
-        ageYears--;
-        ageMonths += 12;
+      ageYears--;
+      ageMonths += 12;
     }
 
     if (currentDay < dobDay) {
-        ageMonths--;
-        if (ageMonths < 0) {
-            ageMonths += 12;
-            ageYears--;
-        }
+      ageMonths--;
+      if (ageMonths < 0) {
+        ageMonths += 12;
+        ageYears--;
+      }
     }
 
     return ageYears + " years " + ageMonths + " months";
   }
 
   function formatDate(dateStr) {
-    var monthNames = ["January", "February", "March", "April", "May", "June", 
-                      "July", "August", "September", "October", "November", "December"];
+    var monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
 
     var dateArray = dateStr.split('-');
     var day = parseInt(dateArray[0]);
@@ -201,11 +200,11 @@ const DashboardScreen = () => {
 
   const getClassColor = (index) => {
     const colors = ['#ff6347', '#ffa500', '#ffd700', '#32cd32', '#4169e1', '#8a2be2', '#ff69b4', '#00ced1', '#4b0082', '#20b2aa']; // Pre-defined colors
-    return colors[index % colors.length]; 
+    return colors[index % colors.length];
   };
-  
+
   const pieChartData = (data) => {
-      return data.map((value, index) => ({
+    return data.map((value, index) => ({
       name: getClassLabel(index),
       population: value,
       color: getClassColor(index),
@@ -247,13 +246,13 @@ const DashboardScreen = () => {
       </style>
       <table>
         <thead><tr>`;
-  
+
     headers.forEach(header => {
       htmlString += `<th>${header}</th>`;
     });
-  
+
     htmlString += `</tr></thead><tbody>`;
-  
+
 
 
     data.forEach(obj => {
@@ -263,29 +262,29 @@ const DashboardScreen = () => {
       }
       htmlString += '</tr>';
     });
-  
+
     htmlString += '</tbody></table>';
     return htmlString;
   };
 
   const downloadPDF = async (headers, data, fileName) => {
-    try {  
+    try {
       const htmlContent = generateHTMLTable(headers, data);
       const options = {
         html: htmlContent,
         fileName: fileName,
         directory: 'Documents',
       };
-  
+
       const file = await RNHTMLtoPDF.convert(options);
       const filePath = 'file://' + file.filePath;
-      
+
       const shareOptions = {
         url: filePath,
         type: 'application/pdf',
         failOnCancel: false,
       };
-  
+
       await Share.open(shareOptions);
     } catch (error) {
       console.error('Error generating PDF: ', error);
@@ -295,23 +294,23 @@ const DashboardScreen = () => {
 
   const headersForStudent = [
     "Reg No",
-    "Name", 
-    "Father Name", 
-    "Date of Birth", 
+    "Name",
+    "Father Name",
+    "Date of Birth",
     "Age",
     "Gender"
   ];
 
   const headersForClass = [
     "Reg No",
-    "Name", 
-    "Father Name", 
+    "Name",
+    "Father Name",
     "Class"
   ];
 
   const headersForResult = [
     "Reg No",
-    "Name", 
+    "Name",
     "Class",
     "First",
     "Mid",
@@ -321,14 +320,14 @@ const DashboardScreen = () => {
   const getDataForStudentReport = () => {
     const studentReportData = [];
     students.forEach(student => {
-      if(student !== undefined){
+      if (student !== undefined) {
         const studentData = [
           student.id,
           (student.name === undefined) ? "unknown" : student.name,
           (student.fatherName === undefined) ? "unknown" : student.fatherName,
           (student.dob === undefined) ? "unknown" : formatDate(student.dob),
-          (student.dob === undefined) ? calculateYearNMonth("25-12-2004"):calculateYearNMonth(student.dob),
-          (student.gender === undefined)?"unknown": student.gender
+          (student.dob === undefined) ? calculateYearNMonth("25-12-2004") : calculateYearNMonth(student.dob),
+          (student.gender === undefined) ? "unknown" : student.gender
         ];
         studentReportData.push(studentData);
       }
@@ -339,15 +338,15 @@ const DashboardScreen = () => {
       const [bYears, bMonths] = b[4].split(' ').map(str => parseInt(str));
 
       if (aYears !== bYears) {
-          return bYears - aYears;
+        return bYears - aYears;
       } else {
-          return bMonths - aMonths;
+        return bMonths - aMonths;
       }
     });
     return studentReportData;
   };
 
-  const getDataForStudentInClassReport = () => {    
+  const getDataForStudentInClassReport = () => {
     const classOrder = ["nursery", "prep", "1", "2", "3", "4", "5", "6", "7", "8"];
     const studentReportData = [];
     students.forEach(student => {
@@ -361,14 +360,14 @@ const DashboardScreen = () => {
     });
 
     studentReportData.sort((a, b) => {
-        const classA = a[3];
-        const classB = b[3];
-        return classOrder.indexOf(classA) - classOrder.indexOf(classB);
+      const classA = a[3];
+      const classB = b[3];
+      return classOrder.indexOf(classA) - classOrder.indexOf(classB);
     });
 
     return studentReportData;
   };
-  
+
   const calculateCollectiveMark = (marks) => {
     let collectiveMark = 0;
     let i = 0;
@@ -388,17 +387,17 @@ const DashboardScreen = () => {
     return student ? student.name : "unknown";
   };
 
-  const getDataForResultReport = () => {    
+  const getDataForResultReport = () => {
     const resultReportData = [];
     marks.forEach(result => {
-      if(result !== undefined){      
+      if (result !== undefined) {
         const resultData = [
-          (result.regNo === undefined)?"unknown":result.regNo, 
-          (result.regNo === undefined)?"unknown":getStudentNameById(result.regNo),
-          (result.class === undefined)?"unknown":result.class,
-          (result.first === undefined)?"N/A": calculateCollectiveMark(result.first),
-          (result.mid === undefined)?"N/A": calculateCollectiveMark(result.mid),
-          (result.final === undefined)?"N/A": calculateCollectiveMark(result.final)
+          (result.regNo === undefined) ? "unknown" : result.regNo,
+          (result.regNo === undefined) ? "unknown" : getStudentNameById(result.regNo),
+          (result.class === undefined) ? "unknown" : result.class,
+          (result.first === undefined) ? "N/A" : calculateCollectiveMark(result.first),
+          (result.mid === undefined) ? "N/A" : calculateCollectiveMark(result.mid),
+          (result.final === undefined) ? "N/A" : calculateCollectiveMark(result.final)
         ];
         resultReportData.push(resultData);
       }
@@ -409,120 +408,128 @@ const DashboardScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.row}>
-        <View>
-          <Text style={styles.welcomeText}>Welcome Back!</Text>
-          <Text style={styles.subText}>Admin, SmartSchool</Text>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#3cb371" />
         </View>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Timetable')}
-        >
-            <MaterialCommunityIcons name="clock" color='#3cb371' size={50} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.row}>
-        <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Students screen')}>
-          <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
-        </Card>
-        <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Teachers screen')}>
-          <Card.Section content={[{ text: 'Total Teachers', text70: true, grey10: true }, { text: `${teacherCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
-        </Card>
-      </View>
+      ) : (
+        <>
+          <View style={styles.row}>
+            <View>
+              <Text style={styles.welcomeText}>Welcome Back!</Text>
+              <Text style={styles.subText}>Admin, SmartSchool</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Timetable')}
+            >
+              <MaterialCommunityIcons name="clock" color='#3cb371' size={50} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.row}>
+            <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Students screen')}>
+              <Card.Section content={[{ text: 'Total Students', text70: true, grey10: true }, { text: `${studentCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
+            </Card>
+            <Card style={styles.card} flex activeOpacity={1} onPress={() => alert('Manage Teachers screen')}>
+              <Card.Section content={[{ text: 'Total Teachers', text70: true, grey10: true }, { text: `${teacherCount}`, text60: true, green30: true }]} contentStyle={styles.cardContent} />
+            </Card>
+          </View>
 
-      <Card style={styles.bigCard} flex activeOpacity={1}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Students in Each Class</Text>
-          <PieChart
-            data={pieChartData(studentsPerClass)}
-            width={screenWidth}
-            height={220}
-            chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#ffffff',
-              backgroundGradientTo: '#ffffff',
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="5"
-            absolute 
-          />
-          <View style={styles.buttonsContainer}>
-            <Button style = {styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentInClassReport(), headers: headersForClass})} />
-            <Button style = {styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForClass, getDataForStudentInClassReport(), "Student in Class - Report")} />
-          </View>
-        </View>
-      </Card>
-      <Card style={styles.bigCard} flex activeOpacity={1}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Total Boys and Girls in Each Age Group</Text>
-          <ScrollView horizontal={true}>
-            <StackedBarChart
-              data={{
-                labels: Object.keys(ageGroupsData),
-                legend: ['Boys', 'Girls'],
-                data: Object.values(ageGroupsData).map(data => [data.boys, data.girls]),
-                barColors: ['#3366ff', '#ff6699'], // Boys - Blue, Girls - Pink
-              }}
-              width={screenWidth - 25}
-              height={220}
-              yAxisSuffix=""
-              yAxisInterval={1}
-              chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-              }}
-              accessor="population"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              absolute 
-            />
-          </ScrollView>
-          <View style={styles.buttonsContainer}>
-            <Button style = {styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport',  { data: getDataForStudentReport(), headers: headersForStudent})} />
-            <Button style = {styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForStudent, getDataForStudentReport(), "Students Gender & Age Wise Report")} />
-          </View>
-        </View>
-      </Card>
-      <Card style={styles.bigCard} flex activeOpacity={1}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Average percentage in Each Class</Text>
-          <PieChart
-            data={pieChartData(averagePercentagePerClass)}
-            width={screenWidth}
-            height={220}
-            chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#ffffff',
-              backgroundGradientTo: '#ffffff',
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="5"
-            absolute 
-          />
-          <View style={styles.buttonsContainer}>
-            <Button style = {styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForResultReport(), headers: headersForResult})} />
-            <Button style = {styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForResult, getDataForResultReport(), "Average Percentage in Each Class Report")} />
-          </View>
-        </View>
-      </Card>
+          <Card style={styles.bigCard} flex activeOpacity={1}>
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Students in Each Class</Text>
+              <PieChart
+                data={pieChartData(studentsPerClass)}
+                width={screenWidth}
+                height={220}
+                chartConfig={{
+                  backgroundColor: '#ffffff',
+                  backgroundGradientFrom: '#ffffff',
+                  backgroundGradientTo: '#ffffff',
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
+                  },
+                }}
+                accessor="population"
+                backgroundColor="transparent"
+                paddingLeft="5"
+                absolute
+              />
+              <View style={styles.buttonsContainer}>
+                <Button style={styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForStudentInClassReport(), headers: headersForClass })} />
+                <Button style={styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForClass, getDataForStudentInClassReport(), "Student in Class - Report")} />
+              </View>
+            </View>
+          </Card>
+          <Card style={styles.bigCard} flex activeOpacity={1}>
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Total Boys and Girls in Each Age Group</Text>
+              <ScrollView horizontal={true}>
+                <StackedBarChart
+                  data={{
+                    labels: Object.keys(ageGroupsData),
+                    legend: ['Boys', 'Girls'],
+                    data: Object.values(ageGroupsData).map(data => [data.boys, data.girls]),
+                    barColors: ['#3366ff', '#ff6699'], // Boys - Blue, Girls - Pink
+                  }}
+                  width={screenWidth - 25}
+                  height={220}
+                  yAxisSuffix=""
+                  yAxisInterval={1}
+                  chartConfig={{
+                    backgroundColor: '#ffffff',
+                    backgroundGradientFrom: '#ffffff',
+                    backgroundGradientTo: '#ffffff',
+                    decimalPlaces: 0,
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    style: {
+                      borderRadius: 16,
+                    },
+                  }}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="15"
+                  absolute
+                />
+              </ScrollView>
+              <View style={styles.buttonsContainer}>
+                <Button style={styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForStudentReport(), headers: headersForStudent })} />
+                <Button style={styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForStudent, getDataForStudentReport(), "Students Gender & Age Wise Report")} />
+              </View>
+            </View>
+          </Card>
+          <Card style={styles.bigCard} flex activeOpacity={1}>
+            <View style={styles.chartContainer}>
+              <Text style={styles.chartTitle}>Average percentage in Each Class</Text>
+              <PieChart
+                data={pieChartData(averagePercentagePerClass)}
+                width={screenWidth}
+                height={220}
+                chartConfig={{
+                  backgroundColor: '#ffffff',
+                  backgroundGradientFrom: '#ffffff',
+                  backgroundGradientTo: '#ffffff',
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  style: {
+                    borderRadius: 16,
+                  },
+                }}
+                accessor="population"
+                backgroundColor="transparent"
+                paddingLeft="5"
+                absolute
+              />
+              <View style={styles.buttonsContainer}>
+                <Button style={styles.Button} label="View Full Report" onPress={() => navigation.navigate('ViewReport', { data: getDataForResultReport(), headers: headersForResult })} />
+                <Button style={styles.Button} label="Download as PDF" onPress={() => downloadPDF(headersForResult, getDataForResultReport(), "Average Percentage in Each Class Report")} />
+              </View>
+            </View>
+          </Card>
+        </>
+      )}
     </ScrollView>
   );
 };
@@ -566,7 +573,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   bigCard: {
-    width: (screenWidth) - 50, 
+    width: (screenWidth) - 50,
     backgroundColor: '#F2F2F2',
     borderRadius: 10,
     borderWidth: 1,
@@ -611,6 +618,11 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     marginRight: 15,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
