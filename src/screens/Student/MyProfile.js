@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Text, Card, Colors } from 'react-native-ui-lib';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const MyProfile = () => {
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -39,6 +41,33 @@ const MyProfile = () => {
 
     fetchStudentData();
   }, []);
+
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+          <MaterialCommunityIcons name="logout" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+
+  const handleLogout = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'RoleSelection' }],
+        });
+      })
+      .catch(error => {
+        console.error('Error during sign out:', error);
+      });
+  };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -146,6 +175,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.black,
     marginRight: 8,
+  },
+  headerButton: {
+    marginRight: 15,
   },
 });
 
