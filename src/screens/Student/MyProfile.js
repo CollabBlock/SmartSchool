@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Text, Card, Colors } from 'react-native-ui-lib';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -40,7 +40,13 @@ const MyProfile = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {student ? (
+      {loading ? (
+        <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#3cb371" />
+        <Text>Loading...</Text>
+      </View>
+    ) : (
+        
         <>
           <View style={styles.header}>
             <MaterialCommunityIcons name="account-circle" size={80} color={Colors.green30} />
@@ -83,8 +89,7 @@ const MyProfile = () => {
             </View>
           </Card>
         </>
-      ) : (
-        <Text>Loading...</Text>
+      
       )}
     </ScrollView>
   );
@@ -95,6 +100,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',

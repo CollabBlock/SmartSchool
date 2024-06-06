@@ -75,7 +75,7 @@ const MyFee = () => {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3cb371" />
-          <Text style={styles.loadingText}>Loading Fee Data...</Text>
+          <Text >Loading...</Text>
         </View>
       ) : (
         <SectionList
