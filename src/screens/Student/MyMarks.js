@@ -1,92 +1,100 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { View, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Card, Text, Colors } from 'react-native-ui-lib';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const MyMarks = () => {
   const [studentClass, setStudentClass] = useState('');
   const [classTeacher, setClassTeacher] = useState('');
-  const [subjects, setSubjects] = useState([]);
   const [marks, setMarks] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        const user = auth().currentUser;
-        if (!user) {
-          console.error("No authenticated user found.");
-          return;
-        }
+  const fetchStudentData = useCallback(async () => {
+    try {
+      const user = auth().currentUser;
+      if (!user) throw new Error("No authenticated user found.");
 
-        const studentQuerySnapshot = await firestore()
-          .collection('students')
-          .where('email', '==', user.email)
-          .get();
+      const studentQuerySnapshot = await firestore()
+        .collection('students')
+        .where('email', '==', user.email)
+        .get();
 
-        if (!studentQuerySnapshot.empty) {
-          const studentDoc = studentQuerySnapshot.docs[0];
-          const studentData = studentDoc.data();
+      if (!studentQuerySnapshot.empty) {
+        const studentDoc = studentQuerySnapshot.docs[0];
+        const studentData = studentDoc.data();
 
-          setStudentClass(studentData.class);
-          fetchClassTeacher(studentData.class);
-          setSubjects(getSubjectsByClass(studentData.class));
-          fetchMarks(studentData.id, studentData.class);
-        } else {
-          console.error("Student data not found.");
-        }
-      } catch (error) {
-        console.error("Error fetching student data:", error);
-      } finally {
-        setLoading(false);
+        setStudentClass(studentData.class);
+        fetchClassTeacher(studentData.class);
+        fetchMarks(studentData.id, studentData.class);
+      } else {
+        throw new Error("Student data not found.");
       }
-    };
-
-    const fetchClassTeacher = async (className) => {
-      try {
-        const teacherQuerySnapshot = await firestore()
-          .collection('teachers')
-          .where('class', '==', className)
-          .get();
-
-        if (!teacherQuerySnapshot.empty) {
-          const teacherDoc = teacherQuerySnapshot.docs[0];
-          const teacherData = teacherDoc.data();
-          setClassTeacher(teacherData.name);
-        } else {
-          setClassTeacher('No class teacher assigned');
-        }
-      } catch (error) {
-        console.error("Error fetching class teacher data:", error);
-      }
-    };
-
-    const fetchMarks = async (studentId, className) => {
-      try {
-        const regNo = studentId.toString();
-        const marksQuerySnapshot = await firestore()
-          .collection('marks')
-          .where('regNo', '==', regNo)
-          .where('class', '==', className)
-          .get();
-
-        if (!marksQuerySnapshot.empty) {
-          const marksDoc = marksQuerySnapshot.docs[0];
-          const marksData = marksDoc.data();
-          setMarks(marksData);
-        } else {
-          console.error(`Marks data not found for regNo: ${regNo} in class: ${className}`);
-        }
-      } catch (error) {
-        console.error("Error fetching marks data:", error);
-      }
-    };
-
-    fetchStudentData();
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const getSubjectsByClass = (className) => {
+  const fetchClassTeacher = useCallback(async (className) => {
+    try {
+      const teacherQuerySnapshot = await firestore()
+        .collection('teachers')
+        .where('class', '==', className)
+        .get();
+
+      if (!teacherQuerySnapshot.empty) {
+        const teacherDoc = teacherQuerySnapshot.docs[0];
+        const teacherData = teacherDoc.data();
+        setClassTeacher(teacherData.name);
+      } else {
+        setClassTeacher('No class teacher assigned');
+      }
+    } catch (error) {
+      console.error("Error fetching class teacher data:", error);
+    }
+  }, []);
+
+  const fetchMarks = useCallback(async (studentId, className) => {
+    try {
+      const regNo = studentId.toString();
+      const marksQuerySnapshot = await firestore()
+        .collection('marks')
+        .where('regNo', '==', regNo)
+        .where('class', '==', className)
+        .get();
+
+      if (!marksQuerySnapshot.empty) {
+        const marksDoc = marksQuerySnapshot.docs[0];
+        const marksData = marksDoc.data();
+        setMarks(marksData);
+      } else {
+        console.error(`Marks data not found for regNo: ${regNo} in class: ${className}`);
+      }
+    } catch (error) {
+      console.error("Error fetching marks data:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudentData();
+  }, [fetchStudentData]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('MarksHistory')} style={styles.headerButton}>
+          <MaterialCommunityIcons name="history" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  const getSubjectsByClass = useCallback((className) => {
     const subjectsByClass = {
       Nursery: ['English', 'Urdu', 'Math', 'Nazra-e-Quran'],
       Prep: ['English', 'Urdu', 'Math', 'Nazra-e-Quran', 'General Knowledge'],
@@ -100,16 +108,18 @@ const MyMarks = () => {
       8: ['English', 'Urdu', 'Math', 'General Knowledge', 'Social Study', 'Islamyat', 'Computer', 'Quran'],
     };
     return subjectsByClass[className] || [];
-  };
+  }, []);
 
-  const getTotalMarks = (subject, term) => {
+  const subjects = useMemo(() => getSubjectsByClass(studentClass), [studentClass]);
+
+  const getTotalMarks = useCallback((subject, term) => {
     if (subject === 'Computer') {
       return term === 'final' ? [70, 30] : [35, 15];
     }
     return term === 'first' || term === 'mid' ? 50 : 100;
-  };
+  }, []);
 
-  const renderComputerMarks = (term) => {
+  const renderComputerMarks = useCallback((term) => {
     const part1Marks = marks[term.toLowerCase()]?.Computer?.[0] || 'N/A';
     const part2Marks = marks[term.toLowerCase()]?.Computer?.[1] || 'N/A';
     const [totalPart1, totalPart2] = getTotalMarks('Computer', term.toLowerCase());
@@ -126,9 +136,9 @@ const MyMarks = () => {
         </View>
       </>
     );
-  };
+  }, [marks, getTotalMarks]);
 
-  const renderSubjectItem = ({ item }) => {
+  const renderSubjectItem = useCallback(({ item }) => {
     return (
       <Card style={styles.card} key={item}>
         <Card.Section
@@ -154,7 +164,7 @@ const MyMarks = () => {
         </View>
       </Card>
     );
-  };
+  }, [marks, renderComputerMarks, getTotalMarks]);
 
   return (
     <View style={styles.container}>
@@ -165,12 +175,11 @@ const MyMarks = () => {
         </View>
       ) : (
         <>
-          <Text style={styles.subjectsTitle}>List of Courses</Text>
           <FlatList
             data={subjects}
             renderItem={renderSubjectItem}
             keyExtractor={(item) => item}
-            contentContainerStyle={styles.subjectList}
+            contentContainerStyle={[styles.subjectList, { paddingBottom: 20 }]}
           />
         </>
       )}
@@ -181,8 +190,8 @@ const MyMarks = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
+    paddingHorizontal: 20,
   },
   containerActivity: {
     flex: 1,
@@ -239,6 +248,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#3cb371',
   },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#3cb371',
+  },
+  headerButton: {
+    marginRight: 15,
+  },
 });
 
 export default MyMarks;
+

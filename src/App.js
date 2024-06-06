@@ -18,6 +18,7 @@ import TeacherBottomNavigator from './screens/Teacher/TeacherBottomNavigator';
 import TimetableScreen from './screens/Admin/TimeTable/TimeTableScreen.js';
 import StudentBottomBar from './screens/Student/StudentBottomBar.js';
 import SubjectDetails from './screens/Student/SubjectDetails.js';
+import MarksHistory from './screens/Student/MarksHistory.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -116,6 +117,11 @@ const App = () => {
           options={{ title: 'Timetable' }}
         />
 
+        <Stack.Screen
+          name="MarksHistory"
+          component={MarksHistory}
+          options={{ title: 'Marks History' }}
+        />
         </Stack.Navigator>
       </NavigationContainer>
   );
