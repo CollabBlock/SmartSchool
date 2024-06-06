@@ -32,6 +32,8 @@ const MyProfile = () => {
       } catch (error) {
         console.error("Error fetching student data:", error);
         Alert.alert("Error", "Failed to fetch student data.");
+      } finally {
+        setLoading(false);
       }
     };
 
